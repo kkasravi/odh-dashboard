@@ -1,0 +1,11 @@
+apiVersion: config.k8s.io/v1alpha1
+kind: Krmfile
+openAPI:
+  definitions:
+    io.k8s.cli.setters.DASHBOARD_NAME:
+      description: dashboard name
+      x-k8s-cli:
+        setter:
+          name: DASHBOARD_NAME
+          value: kam-dashboard
+          isSet: true
