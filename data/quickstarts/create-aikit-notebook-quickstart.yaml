@@ -1,0 +1,66 @@
+kind: ConsoleQuickStart
+metadata:
+  name: create-aikit-notebook
+spec:
+  displayName: Creating an AIKit notebook
+  durationMinutes: 5
+  icon: 'images/intel.svg'
+  description: This quick start will walk you through creating an AIKit notebook.
+  introduction: |-
+    ### This quick start shows you how to create an AIKit notebook.
+    Red Hat® OpenShift® Data Scientist lets you run AIKit notebooks on our Red Hat® OpenShift Dedicated environment.
+
+
+    This quick start will get you working in an AIKit notebook in just a few minutes.
+  tasks:
+    - title: Launch AIKit
+      description: |-
+        ### To find the AIKit Launch action:
+        1. In the **Applications** menu item, go to **Enabled** projects.
+        2. Find the AIKit entry.
+        3. Click **Launch** on the AIKit card to access the JupyterHub Spawner.
+
+        A new browser tab window will open displaying the JupyterHub Spawner.
+      review:
+        instructions: |-
+          #### To verify you have launched the JupyterHub Spawner:
+          Is a new browser tab visible that reads Spawner Options?
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You have launched the Jupyter Spawner!
+        failed: Try the steps again.
+    - title: Spawn an environment
+      description: |-
+        ### Spawning an environment:
+        1. Select the AIKit image from the dropdown menu.
+        2. Select a container size based on your computation needs.
+        3. Click the **Start** button.
+
+        The Spawner Options page will reload and indicate that the system is starting up.
+      review:
+        instructions: |-
+          #### To verify that you have launched the AIKit notebook:
+          Do you see an visual on the Spawner options screen that says the server is running?
+        failedTaskHelp: This task isn’t verified yet. Try the task again.
+      summary:
+        success: You have verified that the Jupyter Spawner has started!
+        failed: Try the steps again.
+    - title: Create your first notebook
+      description: |-
+        ### To create a notebook, follow these steps:
+        1. Under the Notebook display click the AIKit tile. 
+        2. When the new notebook opens, verify that you see AIKit in the upper right navigation bar.
+
+        You have now launched an AIKit notebook and can begin writing Python.
+      review:
+        instructions: |-
+          #### Verify that your AIKit notebook launched with the AIKit kernel:
+          Is AIKit displaying in the upper right notification bar of your notebook?
+        failedTaskHelp:
+          This task isn’t verified yet. Try the task again.
+      summary:
+        success: You have added health checks to your sample app!
+        failed: Try the steps again.
+  conclusion: You are now able to launch AIKit notebooks and write Python code.  If you want to learn how to deploy
+    a model, take the next quick start.
+  nextQuickStart: [deploy-python-model]

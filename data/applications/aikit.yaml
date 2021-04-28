@@ -1,0 +1,15 @@
+metadata:
+  name: aikit
+spec:
+  displayName: AIKit
+  provider: Intel
+  description: |-
+    A conda based notebook with intel-aikit packages installed.
+  kfdefApplications: ['jupyterhub', 'notebook-images']
+  route: jupyterhub
+  img: images/intel.svg
+  category: Intel managed
+  support: Intel
+  docsLink: https://software.intel.com/content/www/us/en/develop/tools/oneapi/ai-analytics-toolkit.html
+  quickStart: create-aikit-notebook
+  getStartedLink: https://software.intel.com/content/www/us/en/develop/documentation/get-started-with-ai-linux/top.html
