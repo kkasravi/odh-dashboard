@@ -2,6 +2,7 @@ OC_PROJECT ?= redhat-ods-applications
 DASHBOARD_NAME ?= odh-dashboard
 IMAGE ?= s2i-odh-dashboard
 TAG ?= v0.0.1
+REPLICAS ?= 2
 
 all: output-vars
 
