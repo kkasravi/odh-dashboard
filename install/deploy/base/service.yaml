@@ -2,10 +2,10 @@
 kind: Service
 apiVersion: v1
 metadata:
-  name: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+  name: $(DASHBOARD_NAME)
 spec:
   selector:
-    deployment: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+    deployment: $(DASHBOARD_NAME)
   ports:
   - name: http
     protocol: TCP

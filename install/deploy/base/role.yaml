@@ -1,7 +1,7 @@
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+  name: $(DASHBOARD_NAME)
 rules:
 - apiGroups:
   - route.openshift.io

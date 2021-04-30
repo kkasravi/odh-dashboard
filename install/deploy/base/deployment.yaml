@@ -1,23 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-#  name: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
   name: $(DASHBOARD_NAME)
 spec:
   replicas: 2 # {"$openapi":"REPLICAS"}
   selector:
     matchLabels:
-      deployment: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+      deployment: $(DASHBOARD_NAME)
   template:
     metadata:
       labels:
-        deployment: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+        deployment: $(DASHBOARD_NAME)
       annotations:
         alpha.image.policy.openshift.io/resolve-names: '*'
     spec:
-      serviceAccount: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+      serviceAccount: $(DASHBOARD_NAME)
       containers:
-      - name: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+      - name: $(DASHBOARD_NAME)
         image: s2i-odh-dashboard:v0.0.1
         imagePullPolicy: Always
         ports:
