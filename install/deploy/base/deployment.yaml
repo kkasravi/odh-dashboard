@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: $(DASHBOARD_NAME)
 spec:
-  replicas: 2 # {"$openapi":"REPLICAS"}
+  replicas: 1 # {"$openapi":"REPLICAS"}
   selector:
     matchLabels:
       deployment: $(DASHBOARD_NAME)
