@@ -6,8 +6,8 @@ TAG ?= v0.0.1
 all: build
 
 import-image:
-	kubectl delete imagestream nodejs-14
-	oc import-image nodejs-14:1-28 --from=registry.access.redhat.com/ubi8 --confirm
+	kubectl delete imagestream nodejs-14 || exit 0
+	oc import-image registry.access.redhat.com/ubi8/nodejs-14:1-28 --confirm
 
 set-namespace:
 	kustomize edit set namespace $(OC_PROJECT)
