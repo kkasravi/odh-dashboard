@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+#  name: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
+  name: $(DASHBOARD_NAME)
 spec:
   replicas: 2 # {"$openapi":"REPLICAS"}
   selector:
