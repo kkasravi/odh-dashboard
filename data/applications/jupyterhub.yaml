@@ -8,7 +8,7 @@ spec:
   kfdefApplications: ['jupyterhub', 'notebook-images']
   csvName: kam
   route: jupyterhub
-  routeNamespace: ods-redhat-applications
+  routeNamespace: redhat-ods-applications
   img: images/jupyterhub.svg
   category: Red Hat managed
   support: red hat
