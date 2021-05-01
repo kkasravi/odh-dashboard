@@ -6,7 +6,9 @@ spec:
   description: |-
     A multi-user version of the notebook designed for companies, classrooms and research labs.
   kfdefApplications: ['jupyterhub', 'notebook-images']
+  csvName: kam
   route: jupyterhub
+  routeNamespace: ods-redhat-applications
   img: images/jupyterhub.svg
   category: Red Hat managed
   support: red hat

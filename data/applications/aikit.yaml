@@ -6,7 +6,7 @@ spec:
   description: |-
     A conda based notebook with intel-aikit packages installed.
   kfdefApplications: ['jupyterhub', 'notebook-images']
-  csvName: aikit-operator
+  csvName: kam
   route: jupyterhub
   routeNamespace: ods-redhat-applications
   img: images/intel.svg
