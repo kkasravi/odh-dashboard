@@ -51,3 +51,29 @@ rules:
   - patch
   resources:
   - imagestreams
+- apiGroups:
+  - console.openshift.io
+  resources:
+  - consoleapplications
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - console.openshift.io
+  resources:
+  - consoleapplications/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - console.openshift.io
+  resources:
+  - consoleapplications/status
+  verbs:
+  - get
+  - patch
+  - update
