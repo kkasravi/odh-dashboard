@@ -1,0 +1,90 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.4.1
+  creationTimestamp: null
+  name: consoleapplications.console.openshift.io
+spec:
+  group: console.openshift.io
+  names:
+    kind: ConsoleApplication
+    listKind: ConsoleApplicationList
+    plural: consoleapplications
+    singular: consoleapplication
+  scope: Namespaced
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: ConsoleApplication is the Schema for the consoleapplications
+          API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: ConsoleApplicationSpec defines the desired state of ConsoleApplication
+            properties:
+              category:
+                type: string
+              csvName:
+                type: string
+              description:
+                type: string
+              displayName:
+                type: string
+              docsLink:
+                type: string
+              enable:
+                type: boolean
+              getStartedLink:
+                type: string
+              img:
+                type: string
+              isEnabled:
+                type: boolean
+              kfdefApplications:
+                items:
+                  type: string
+                type: array
+              link:
+                type: string
+              provider:
+                type: string
+              quickStart:
+                type: string
+              route:
+                type: string
+              routeNamespace:
+                type: string
+              serviceName:
+                type: string
+              support:
+                type: string
+            required:
+            - kfdefApplications
+            type: object
+          status:
+            description: ConsoleApplicationStatus defines the observed state of ConsoleApplication
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
+status:
+  acceptedNames:
+    kind: ""
+    plural: ""
+  conditions: []
+  storedVersions: []

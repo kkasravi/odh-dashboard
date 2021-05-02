@@ -112,24 +112,6 @@ const getEnabledConfigMaps = (fastify, appDefs) => {
   return Promise.all(configMapGetters);
 };
 
-/*
-const getApplicationDefs = () => {
-  const normalizedPath = path.join(__dirname, '../../../../data/applications');
-  const applicationDefs = [];
-  fs.readdirSync(normalizedPath).forEach((file) => {
-    if (constants.yamlRegExp.test(file)) {
-      try {
-        const doc = jsYaml.load(fs.readFileSync(path.join(normalizedPath, file), 'utf8'));
-        applicationDefs.push(doc);
-      } catch (e) {
-        console.error(`Error loading application definition ${file}: ${e}`);
-      }
-    }
-  });
-  return applicationDefs;
-};
-*/
-
 module.exports = {
   getInstalledKfdefs,
   getLink,
