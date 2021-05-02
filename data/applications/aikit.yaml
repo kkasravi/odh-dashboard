@@ -1,3 +1,5 @@
+apiVersion: console.openshift.io/v1alpha1
+kind: ConsoleApplication
 metadata:
   name: aikit
 spec:
@@ -6,7 +8,7 @@ spec:
   description: |-
     A conda based notebook with intel-aikit packages installed.
   kfdefApplications: ['jupyterhub', 'notebook-images']
-  csvName: kam
+  csvName: opendatahub
   route: jupyterhub
   routeNamespace: redhat-ods-applications
   img: images/intel.svg

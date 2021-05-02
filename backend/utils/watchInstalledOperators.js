@@ -10,9 +10,9 @@ const fetchInstalledOperators = (customObjectsApi) => {
       const csvs = res?.body?.items;
       if (csvs?.length) {
         return csvs.reduce((acc, csv) => {
-          if (csv.status?.phase === 'Succeeded' && csv.status?.reason === 'InstallSucceeded') {
+//          if (csv.status?.phase === 'Succeeded' && csv.status?.reason === 'InstallSucceeded') {
             acc.push(csv);
-          }
+//          }
           return acc;
         }, []);
       }

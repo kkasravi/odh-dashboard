@@ -1,3 +1,5 @@
+apiVersion: console.openshift.io/v1alpha1
+kind: ConsoleApplication
 metadata:
   name: jupyterhub
 spec:
@@ -6,7 +8,7 @@ spec:
   description: |-
     A multi-user version of the notebook designed for companies, classrooms and research labs.
   kfdefApplications: ['jupyterhub', 'notebook-images']
-  csvName: kam
+  csvName: opendatahub
   route: jupyterhub
   routeNamespace: redhat-ods-applications
   img: images/jupyterhub.svg

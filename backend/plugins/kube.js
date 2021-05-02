@@ -4,6 +4,7 @@ const { DEV_MODE } = require('../utils/constants');
 const fs = require('fs');
 const fp = require('fastify-plugin');
 const k8s = require('@kubernetes/client-node');
+const WatchConsoleApplications = require('../utils/watchConsoleApplications');
 const WatchInstalledOperators = require('../utils/watchInstalledOperators');
 const WatchServices = require('../utils/watchServices');
 
@@ -37,6 +38,7 @@ module.exports = fp(async (fastify) => {
   });
 
   // TODO: Watch only when a UI connects
+  WatchConsoleApplications.startWatching(fastify);
   WatchInstalledOperators.startWatching(customObjectsApi);
   WatchServices.startWatching(coreV1Api);
 });

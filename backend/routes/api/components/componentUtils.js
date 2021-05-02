@@ -112,6 +112,7 @@ const getEnabledConfigMaps = (fastify, appDefs) => {
   return Promise.all(configMapGetters);
 };
 
+/*
 const getApplicationDefs = () => {
   const normalizedPath = path.join(__dirname, '../../../../data/applications');
   const applicationDefs = [];
@@ -127,12 +128,12 @@ const getApplicationDefs = () => {
   });
   return applicationDefs;
 };
+*/
 
 module.exports = {
   getInstalledKfdefs,
   getLink,
   getServiceLink,
   getApplicationEnabledConfigMap,
-  getEnabledConfigMaps,
-  getApplicationDefs,
+  getEnabledConfigMaps
 };

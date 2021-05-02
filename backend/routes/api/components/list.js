@@ -1,9 +1,11 @@
 const WatchInstalledOperators = require('../../../utils/watchInstalledOperators');
 const WatchServices = require('../../../utils/watchServices');
+const WatchConsoleApplications = require('../../../utils/watchConsoleApplications');
+
 const componentUtils = require('./componentUtils');
 
 module.exports = async ({ fastify, request }) => {
-  const applicationDefs = componentUtils.getApplicationDefs();
+  const applicationDefs = WatchConsoleApplications.getConsoleApplications();
 
   // Fetch the installed kfDefs
   const kfdefApps = await componentUtils.getInstalledKfdefs(fastify);
@@ -15,7 +17,12 @@ module.exports = async ({ fastify, request }) => {
   const enabledCMs = await componentUtils.getEnabledConfigMaps(fastify, applicationDefs);
   const getCSVForApp = (app) =>
     operatorCSVs.find(
-      (operator) => app.spec.csvName && operator.metadata.name.startsWith(app.spec.csvName),
+      (operator) => {
+        if (app.spec.csvName && operator.metadata.name.startsWith(app.spec.csvName)) {
+          return true;
+        }
+        return false;
+      }
     );
 
   // Get the components associated with the installed KfDefs or operators
