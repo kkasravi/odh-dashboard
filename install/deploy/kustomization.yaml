@@ -6,4 +6,4 @@ images:
 - name: s2i-odh-dashboard
   newName: s2i-odh-dashboard
   newTag: v0.0.1
-namespace: redhat-ods-applications
+#namespace: redhat-ods-applications
