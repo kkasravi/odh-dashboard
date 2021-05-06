@@ -1,9 +1,9 @@
 kind: BuildConfig
 apiVersion: build.openshift.io/v1
 metadata:
-  name: s2i-odh-dashboard # {"$openapi":"IMAGE_NAME"}
+  name: s2i-kam-dashboard # {"$openapi":"IMAGE_NAME"}
   labels:
-    build: s2i-odh-dashboard # {"$openapi":"IMAGE_NAME"}
+    build: s2i-kam-dashboard # {"$openapi":"IMAGE_NAME"}
 spec:
   triggers:
   - type: ConfigChange
@@ -32,4 +32,4 @@ spec:
   output:
     to:
       kind: ImageStreamTag
-      name: s2i-odh-dashboard:v0.0.1 # {"$openapi":"IMAGE_TAG"}
+      name: s2i-kam-dashboard:v0.0.1 # {"$openapi":"IMAGE_TAG"}
