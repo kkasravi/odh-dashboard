@@ -1,5 +1,5 @@
 import { FastifyRequest } from 'fastify';
-import { KubeFastifyInstance, OdhApplication } from '../../../types';
+import { KubeFastifyInstance, RhodsApplication } from '../../../types';
 import { getEnabledConfigMaps, getLink, getServiceLink } from '../../../utils/componentUtils';
 import {
   getApplicationDefs,
@@ -11,7 +11,7 @@ import {
 export const listComponents = async (
   fastify: KubeFastifyInstance,
   request: FastifyRequest,
-): Promise<OdhApplication[]> => {
+): Promise<RhodsApplication[]> => {
   const applicationDefs = getApplicationDefs();
 
   // Fetch the installed kfDefs
@@ -22,7 +22,7 @@ export const listComponents = async (
 
   // Fetch the enabled config maps
   const enabledCMs = await getEnabledConfigMaps(fastify, applicationDefs);
-  const getCSVForApp = (app: OdhApplication) =>
+  const getCSVForApp = (app: RhodsApplication) =>
     operatorCSVs.find(
       (operator) => app.spec.csvName && operator.metadata?.name?.startsWith(app.spec.csvName),
     );
@@ -60,7 +60,7 @@ export const listComponents = async (
   }, []);
 
   await Promise.all(
-    installedComponents.map(async (installedComponent: OdhApplication) => {
+    installedComponents.map(async (installedComponent: RhodsApplication) => {
       if (installedComponent.spec.route) {
         const csv = getCSVForApp(installedComponent);
         if (csv) {

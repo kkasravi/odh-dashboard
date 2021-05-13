@@ -17,16 +17,16 @@ Before developing for ODH, the basic requirements:
 * [s2i](https://github.com/openshift/source-to-image)
 * [Quay.io](https://quay.io/)
 
-## Deploy OdhApplications, OdhDocuments to the OpenShift cluster
-   1. Deploy the OdhApplications, OdhDocuments CRDS
+## Deploy RhodsApplications, RhodsDocuments to the OpenShift cluster
+   1. Deploy the RhodsApplications, RhodsDocuments CRDS
       ```
       oc apply -f install/deploy/base/custom-resource-definition.yaml
       ```
 
-   2. Deploy the OdhApplications, OdhDocuments Resources to your OC_PROJECT
+   2. Deploy the RhodsApplications, RhodsDocuments Resources to your OC_PROJECT
       ```
       oc project $OC_PROJECT
-      cat install/deploy/base/{odh-application.yaml,odh-document.yaml} | oc apply -f -
+      cat install/deploy/base/{rhods-application.yaml,rhods-document.yaml} | oc apply -f -
       ```
 
 ## Development

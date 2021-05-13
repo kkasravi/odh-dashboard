@@ -5,20 +5,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: odhapplications.applications.console.openshift.io
+  name: rhodsapplications.applications.console.openshift.io
 spec:
   group: applications.console.openshift.io
   names:
-    kind: OdhApplication
-    listKind: OdhApplicationList
-    plural: odhapplications
-    singular: odhapplication
+    kind: RhodsApplication
+    listKind: RhodsApplicationList
+    plural: rhodsapplications
+    singular: rhodsapplication
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: OdhApplication is the Schema for the odhapplications
+        description: RhodsApplication is the Schema for the rhodsapplications
           API
         properties:
           apiVersion:
@@ -34,7 +34,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: OdhApplicationSpec defines the desired state of OdhApplication
+            description: RhodsApplicationSpec defines the desired state of rhodsApplication
             properties:
               category:
                 type: string
@@ -109,7 +109,7 @@ spec:
             - kfdefApplications
             type: object
           status:
-            description: OdhApplicationStatus defines the observed state of OdhApplication
+            description: RhodsApplicationStatus defines the observed state of RhodsApplication
             properties:
               enabled:
                 type: boolean
@@ -132,20 +132,20 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.4.1
   creationTimestamp: null
-  name: odhdocuments.documents.console.openshift.io
+  name: rhodsdocuments.documents.console.openshift.io
 spec:
   group: documents.console.openshift.io
   names:
-    kind: OdhDocument
-    listKind: OdhDocumentList
-    plural: odhdocuments
-    singular: odhdocument
+    kind: RhodsDocument
+    listKind: RhodsDocumentList
+    plural: rhodsdocuments
+    singular: rhodsdocument
   scope: Namespaced
   versions:
   - name: v1alpha1
     schema:
       openAPIV3Schema:
-        description: OdhDocument is the Schema for the odhdocuments
+        description: RhodsDocument is the Schema for the rhodsdocuments
           API
         properties:
           apiVersion:
@@ -161,7 +161,7 @@ spec:
           metadata:
             type: object
           spec:
-            description: OdhDocumentSpec defines the desired state of OdhDocument
+            description: RhodsDocumentSpec defines the desired state of RhodsDocument
             properties:
               appName:
                 type: string
@@ -189,7 +189,7 @@ spec:
             - durationMinutes
             type: object
           status:
-            description: OdhDocumentStatus defines the observed state of OdhDocument
+            description: RhodsDocumentStatus defines the observed state of RhodsDocument
             properties:
               enabled:
                 type: boolean

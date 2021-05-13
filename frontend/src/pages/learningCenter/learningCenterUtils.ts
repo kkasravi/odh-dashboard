@@ -1,4 +1,4 @@
-import { OdhDocument, OdhDocumentType } from '../../types';
+import { ODHDoc, ODHDocType } from '../../types';
 
 export const SEARCH_FILTER_KEY = 'keyword';
 export const DOC_TYPE_FILTER_KEY = 'type';
@@ -10,15 +10,15 @@ export const SORT_DESC = 'DESC';
 export const SORT_TYPE_NAME = 'name';
 export const SORT_TYPE_TYPE = 'type';
 
-export const getTextForDocType = (docType: OdhDocumentType): string => {
+export const getTextForDocType = (docType: ODHDocType): string => {
   switch (docType) {
-    case OdhDocumentType.Documentation:
+    case ODHDocType.Documentation:
       return 'Documentation';
-    case OdhDocumentType.Tutorial:
+    case ODHDocType.Tutorial:
       return 'Tutorial';
-    case OdhDocumentType.QuickStart:
+    case ODHDocType.QuickStart:
       return 'Quick start';
-    case OdhDocumentType.HowTo:
+    case ODHDocType.HowTo:
       return 'How-to';
     default:
       return 'Documentation';
@@ -26,18 +26,18 @@ export const getTextForDocType = (docType: OdhDocumentType): string => {
 };
 
 export const doesDocAppMatch = (
-  OdhDocument: OdhDocument,
+  odhDoc: ODHDoc,
   filterText: string,
   typeFilters: string[],
 ): boolean => {
-  if (typeFilters.length && !typeFilters.includes(OdhDocument.spec.type)) {
+  if (typeFilters.length && !typeFilters.includes(odhDoc.spec.type)) {
     return false;
   }
   const searchText = filterText.toLowerCase();
   const {
     metadata: { name },
     spec: { displayName, description, appName, provider },
-  } = OdhDocument;
+  } = odhDoc;
   return (
     !searchText ||
     name.toLowerCase().includes(searchText) ||

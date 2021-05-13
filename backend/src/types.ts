@@ -68,7 +68,6 @@ export type KubeStatus = {
   currentContext: string;
   currentUser: User;
   namespace: string;
-  userName: string | string[];
 };
 
 export type KubeDecorator = KubeStatus & {
@@ -87,7 +86,7 @@ export type KubeFastifyInstance = FastifyInstance & {
  * Common types, should be kept up to date with frontend types
  */
 
-export interface OdhApplication {
+export interface RhodsApplication {
   apiVersion?: string;
   kind?: string;
   metadata?: {
@@ -141,14 +140,14 @@ export interface OdhApplication {
   [k: string]: unknown;
 }
 
-export enum OdhDocumentType {
+export enum RhodsDocumentType {
   Documentation = 'documentation',
   HowTo = 'how-to',
   QuickStart = 'quickstart',
   Tutorial = 'tutorial',
 }
 
-export interface OdhDocument {
+export interface RhodsDocument {
   apiVersion?: string;
   kind?: string;
   metadata?: {
@@ -175,7 +174,7 @@ export interface OdhDocument {
   [k: string]: unknown;
 }
 
-export type OdhGettingStarted = {
+export type ODHGettingStarted = {
   appName: string;
   markdown: string;
 };

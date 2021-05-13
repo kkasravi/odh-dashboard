@@ -1,10 +1,10 @@
 import createError from 'http-errors';
 import * as fs from 'fs';
 import * as path from 'path';
-import { OdhGettingStarted } from '../../../types';
+import { ODHGettingStarted } from '../../../types';
 import { mdRegExp } from '../../../utils/constants';
 
-export const getGettingStartedDoc = (appName: string): OdhGettingStarted[] => {
+export const getGettingStartedDoc = (appName: string): ODHGettingStarted[] => {
   const normalizedPath = path.join(__dirname, '../../../../../data/getting-started');
   try {
     const markdown = fs.readFileSync(path.join(normalizedPath, `${appName}.md`), 'utf8');
@@ -19,9 +19,9 @@ export const getGettingStartedDoc = (appName: string): OdhGettingStarted[] => {
   }
 };
 
-export const getGettingStartedDocs = (): OdhGettingStarted[] => {
+export const getGettingStartedDocs = (): ODHGettingStarted[] => {
   const normalizedPath = path.join(__dirname, '../../../../../data/getting-started');
-  const gettingStartedDocs: OdhGettingStarted[] = [];
+  const gettingStartedDocs: ODHGettingStarted[] = [];
   fs.readdirSync(normalizedPath).forEach((file) => {
     if (mdRegExp.test(file)) {
       try {

@@ -2,7 +2,7 @@
  * Common types, should be kept up to date with backend types
  */
 
-export interface OdhApplication {
+export interface ODHApp {
   apiVersion?: string;
   kind?: string;
   metadata?: {
@@ -56,14 +56,14 @@ export interface OdhApplication {
   [k: string]: unknown;
 }
 
-export enum OdhDocumentType {
+export enum ODHDocType {
   Documentation = 'documentation',
   HowTo = 'how-to',
   QuickStart = 'quickstart',
   Tutorial = 'tutorial',
 }
 
-export interface OdhDocument {
+export interface ODHDoc {
   apiVersion?: string;
   kind?: string;
   metadata?: {
@@ -90,7 +90,7 @@ export interface OdhDocument {
   [k: string]: unknown;
 }
 
-export type OdhGettingStarted = {
+export type ODHGettingStarted = {
   appName: string;
   markDown: string;
 };

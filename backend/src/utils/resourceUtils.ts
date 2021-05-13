@@ -1,20 +1,20 @@
 import createError from 'http-errors';
 import {
+  RhodsApplication,
+  RhodsDocument,
   CSVKind,
   K8sResourceCommon,
   KfDefApplication,
   KfDefResource,
   KubeFastifyInstance,
-  OdhApplication,
-  OdhDocument,
 } from '../types';
 import { ResourceWatcher } from './resourceWatcher';
 import { getComponentFeatureFlags } from './features';
 
 let operatorWatcher: ResourceWatcher<CSVKind>;
 let serviceWatcher: ResourceWatcher<K8sResourceCommon>;
-let appWatcher: ResourceWatcher<OdhApplication>;
-let docWatcher: ResourceWatcher<OdhDocument>;
+let appWatcher: ResourceWatcher<RhodsApplication>;
+let docWatcher: ResourceWatcher<RhodsDocument>;
 let kfDefWatcher: ResourceWatcher<KfDefApplication>;
 
 const fetchInstalledOperators = (fastify: KubeFastifyInstance): Promise<CSVKind[]> => {
@@ -76,76 +76,78 @@ const fetchInstalledKfdefs = async (fastify: KubeFastifyInstance): Promise<KfDef
   return kfdef?.spec?.applications || [];
 };
 
-const fetchOdhApplications = async (fastify: KubeFastifyInstance): Promise<OdhApplication[]> => {
+const fetchRhodsApplications = async (
+  fastify: KubeFastifyInstance,
+): Promise<RhodsApplication[]> => {
   const customObjectsApi = fastify.kube.customObjectsApi;
   const namespace = fastify.kube.namespace;
   const featureFlags = getComponentFeatureFlags();
 
-  let odhApplications: OdhApplication[];
+  let rhodsApplications: RhodsApplication[];
   try {
     const res = await customObjectsApi.listNamespacedCustomObject(
       'applications.console.openshift.io',
       'v1alpha1',
       namespace,
-      'odhapplications',
+      'rhodsapplications',
     );
-    const cas = (res?.body as { items: OdhApplication[] })?.items;
-    odhApplications = cas.reduce((acc, ca) => {
+    const cas = (res?.body as { items: RhodsApplication[] })?.items;
+    rhodsApplications = cas.reduce((acc, ca) => {
       if (!ca.spec.featureFlag || featureFlags[ca.spec.featureFlag]) {
         acc.push(ca);
       }
       return acc;
     }, []);
   } catch (e) {
-    fastify.log.error(e, 'failed to get odhapplications');
-    const error = createError(500, 'failed to get odhapplications');
+    fastify.log.error(e, 'failed to get rhodsapplications');
+    const error = createError(500, 'failed to get rhodsapplications');
     error.explicitInternalServerError = true;
-    error.error = 'failed to get odhapplications';
+    error.error = 'failed to get rhodsapplications';
     error.message =
-      'Unable to get OdhApplication resources. Please ensure the Open Data Hub operator has been installed.';
+      'Unable to get RhodsApplication resources. Please ensure the Open Data Hub operator has been installed.';
     throw error;
   }
-  return Promise.resolve(odhApplications);
+  return Promise.resolve(rhodsApplications);
 };
 
-const fetchOdhDocuments = async (fastify: KubeFastifyInstance): Promise<OdhDocument[]> => {
+const fetchRhodsDocuments = async (fastify: KubeFastifyInstance): Promise<RhodsDocument[]> => {
   const customObjectsApi = fastify.kube.customObjectsApi;
   const namespace = fastify.kube.namespace;
   const featureFlags = getComponentFeatureFlags();
 
-  let odhDocuments: OdhDocument[];
+  let rhodsDocuments: RhodsDocument[];
   try {
     const res = await customObjectsApi.listNamespacedCustomObject(
       'documents.console.openshift.io',
       'v1alpha1',
       namespace,
-      'odhdocuments',
+      'rhodsdocuments',
     );
-    const cas = (res?.body as { items: OdhDocument[] })?.items;
-    odhDocuments = cas.reduce((acc, cd) => {
+    const cas = (res?.body as { items: RhodsDocument[] })?.items;
+    rhodsDocuments = cas.reduce((acc, cd) => {
       if (!cd.spec.featureFlag || featureFlags[cd.spec.featureFlag]) {
         acc.push(cd);
       }
       return acc;
     }, []);
   } catch (e) {
-    fastify.log.error(e, 'failed to get odhdocuments');
-    const error = createError(500, 'failed to get odhdocuments');
+    fastify.log.error(e, 'failed to get rhodsdocuments');
+    const error = createError(500, 'failed to get rhodsdocuments');
     error.explicitInternalServerError = true;
-    error.error = 'failed to get odhdocuments';
+    error.error = 'failed to get rhodsdocuments';
     error.message =
-      'Unable to get OdhDocument resources. Please ensure the Open Data Hub operator has been installed.';
+      'Unable to get RhodsDocument resources. Please ensure the Open Data Hub operator has been installed.';
     throw error;
   }
-  return Promise.resolve(odhDocuments);
+  return Promise.resolve(rhodsDocuments);
 };
 
 export const initializeWatchedResources = (fastify: KubeFastifyInstance): void => {
   operatorWatcher = new ResourceWatcher<CSVKind>(fastify, fetchInstalledOperators);
   serviceWatcher = new ResourceWatcher<K8sResourceCommon>(fastify, fetchServices);
   kfDefWatcher = new ResourceWatcher<KfDefApplication>(fastify, fetchInstalledKfdefs);
-  appWatcher = new ResourceWatcher<OdhApplication>(fastify, fetchOdhApplications);
-  docWatcher = new ResourceWatcher<OdhDocument>(fastify, fetchOdhDocuments);
+  appWatcher = new ResourceWatcher<RhodsApplication>(fastify, fetchRhodsApplications);
+  docWatcher = new ResourceWatcher<RhodsDocument>(fastify, fetchRhodsDocuments);
 };
 
 export const getInstalledOperators = (): K8sResourceCommon[] => {
@@ -160,15 +162,15 @@ export const getInstalledKfdefs = (): KfDefApplication[] => {
   return kfDefWatcher.getResources();
 };
 
-export const getApplicationDefs = (): OdhApplication[] => {
+export const getApplicationDefs = (): RhodsApplication[] => {
   return appWatcher.getResources();
 };
 
-export const getApplicationDef = (appName: string): OdhApplication => {
+export const getApplicationDef = (appName: string): RhodsApplication => {
   const appDefs = getApplicationDefs();
   return appDefs.find((appDef) => appDef.metadata.name === appName);
 };
 
-export const getDocs = (): OdhDocument[] => {
+export const getDocs = (): RhodsDocument[] => {
   return docWatcher.getResources();
 };

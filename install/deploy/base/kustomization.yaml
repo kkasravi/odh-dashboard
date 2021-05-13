@@ -10,5 +10,5 @@ resources:
 - deployment.yaml
 - routes.yaml
 - service.yaml
-- odh-application.yaml
-- odh-document.yaml
+- rhods-application.yaml
+- rhods-document.yaml
