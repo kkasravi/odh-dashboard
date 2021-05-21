@@ -41,6 +41,7 @@ spec:
   description: |-
     A multi-user version of the notebook designed for companies, classrooms and research labs.
   kfdefApplications: ['jupyterhub', 'notebook-images']
+  csvName: opendatahub
   route: jupyterhub
   img: images/jupyterhub.svg
   category: Red Hat managed
@@ -60,6 +61,8 @@ spec:
     Deliver high-performance deep learning (DL) training on Intel® XPUs and integrate fast inference into your AI development workflow with Intel-optimized DL frameworks: TensorFlow and PyTorch, pretrained models, and low-precision tools. 
   kfdefApplications: ['jupyterhub', 'notebook-images']
   route: jupyterhub
+  routeNamespace: redhat-ods-applications
+  csvName: opendatahub
   img: images/oneapi.png
   category: Intel managed
   support: Intel
