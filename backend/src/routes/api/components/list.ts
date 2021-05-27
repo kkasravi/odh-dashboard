@@ -1,5 +1,6 @@
 import { FastifyRequest } from 'fastify';
-import { KubeFastifyInstance, RhodsApplication } from '../../../types';
+import { KubeFastifyInstance } from '../../../types';
+import { RhodsApplication } from '../../../gen/io.openshift.console.applications.v1alpha1';
 import { getEnabledConfigMaps, getLink, getServiceLink } from '../../../utils/componentUtils';
 import {
   getApplicationDefs,

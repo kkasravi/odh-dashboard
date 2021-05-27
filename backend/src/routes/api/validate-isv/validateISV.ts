@@ -2,7 +2,8 @@ import createError from 'http-errors';
 import { IncomingMessage } from 'http';
 import { CoreV1Api, V1Secret } from '@kubernetes/client-node';
 import { FastifyRequest } from 'fastify';
-import { KubeFastifyInstance, RhodsApplication } from '../../../types';
+import { KubeFastifyInstance } from '../../../types';
+import { RhodsApplication } from '../../../gen/io.openshift.console.applications.v1alpha1';
 import { getApplicationDef } from '../../../utils/resourceUtils';
 
 const doSleep = (timeout: number) => {

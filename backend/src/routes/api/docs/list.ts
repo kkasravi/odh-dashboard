@@ -1,5 +1,6 @@
 import { FastifyRequest } from 'fastify';
-import { RhodsDocument, KubeFastifyInstance } from '../../../types';
+import { KubeFastifyInstance } from '../../../types';
+import { RhodsDocument } from '../../../gen/io.openshift.console.documents.v1alpha1';
 import { getDocs } from '../../../utils/resourceUtils';
 
 export const listDocs = (

@@ -1,13 +1,13 @@
 import createError from 'http-errors';
 import {
-  RhodsApplication,
-  RhodsDocument,
   CSVKind,
   K8sResourceCommon,
   KfDefApplication,
   KfDefResource,
   KubeFastifyInstance,
 } from '../types';
+import { RhodsApplication } from '../gen/io.openshift.console.applications.v1alpha1';
+import { RhodsDocument } from '../gen/io.openshift.console.documents.v1alpha1';
 import { ResourceWatcher } from './resourceWatcher';
 import { getComponentFeatureFlags } from './features';
 

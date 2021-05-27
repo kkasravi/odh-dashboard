@@ -1,6 +1,7 @@
 //import { IncomingMessage } from 'http';
 import { V1ConfigMap } from '@kubernetes/client-node/dist/gen/model/v1ConfigMap';
-import { RhodsApplication, K8sResourceCommon, KubeFastifyInstance, RouteKind } from '../types';
+import { K8sResourceCommon, KubeFastifyInstance, RouteKind } from '../types';
+import { RhodsApplication } from '../gen/io.openshift.console.applications.v1alpha1';
 
 /*
 type RoutesResponse = {

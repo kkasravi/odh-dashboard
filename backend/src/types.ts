@@ -86,6 +86,7 @@ export type KubeFastifyInstance = FastifyInstance & {
  * Common types, should be kept up to date with frontend types
  */
 
+/*
 export interface RhodsApplication {
   apiVersion?: string;
   kind?: string;
@@ -173,6 +174,7 @@ export interface RhodsDocument {
   };
   [k: string]: unknown;
 }
+*/
 
 export type ODHGettingStarted = {
   appName: string;
