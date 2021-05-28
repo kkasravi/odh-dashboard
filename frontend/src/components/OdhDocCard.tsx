@@ -3,7 +3,8 @@ import * as classNames from 'classnames';
 import { Card, CardBody, CardFooter, CardHeader, CardTitle } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, StarIcon } from '@patternfly/react-icons';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
-import { ODHDoc, ODHDocType } from '../types';
+import { OdhDocumentType } from '../types';
+import { OdhDocument } from '../gen/io.openshift.console.documents.v1alpha1';
 import {
   getLaunchStatus,
   getQuickStartLabel,
@@ -17,7 +18,7 @@ import { makeCardVisible } from '../utilities/utils';
 import './OdhCard.scss';
 
 type OdhDocCardProps = {
-  odhDoc: ODHDoc;
+  odhDoc: OdhDocument;
   favorite: boolean;
   updateFavorite: (isFavorite: boolean) => void;
 };
@@ -32,7 +33,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc, favorite, updateFavorit
 
   const selected = React.useMemo(() => {
     return (
-      odhDoc.spec.type === ODHDocType.QuickStart &&
+      odhDoc.spec.type === OdhDocumentType.QuickStart &&
       qsContext.activeQuickStartID === odhDoc.metadata.name
     );
   }, [odhDoc.metadata.name, odhDoc.spec.type, qsContext.activeQuickStartID]);
@@ -44,7 +45,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc, favorite, updateFavorit
   }, [odhDoc.metadata.name, selected]);
 
   const footerClassName = React.useMemo(() => {
-    if (odhDoc.spec.type !== ODHDocType.QuickStart) {
+    if (odhDoc.spec.type !== OdhDocumentType.QuickStart) {
       return 'odh-card__footer';
     }
 
@@ -54,7 +55,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc, favorite, updateFavorit
     });
   }, [odhDoc.metadata.name, odhDoc.spec.type, qsContext]);
 
-  if (odhDoc.spec.type === ODHDocType.QuickStart) {
+  if (odhDoc.spec.type === OdhDocumentType.QuickStart) {
     const quickStart = qsContext.allQuickStarts?.find(
       (qs) => qs.metadata.name === odhDoc.metadata.name,
     );
@@ -70,7 +71,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc, favorite, updateFavorit
   };
 
   const renderDocLink = () => {
-    if (odhDoc.spec.type === ODHDocType.Documentation) {
+    if (odhDoc.spec.type === OdhDocumentType.Documentation) {
       return (
         <a
           className="odh-card__footer__link"
@@ -83,7 +84,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc, favorite, updateFavorit
         </a>
       );
     }
-    if (odhDoc.spec.type === ODHDocType.Tutorial) {
+    if (odhDoc.spec.type === OdhDocumentType.Tutorial) {
       return (
         <a
           className="odh-card__footer__link"
@@ -96,14 +97,14 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc, favorite, updateFavorit
         </a>
       );
     }
-    if (odhDoc.spec.type === ODHDocType.QuickStart) {
+    if (odhDoc.spec.type === OdhDocumentType.QuickStart) {
       return (
         <a className="odh-card__footer__link" href="#" onClick={onQuickStart}>
           {getQuickStartLabel(odhDoc.metadata.name, qsContext)}
         </a>
       );
     }
-    if (odhDoc.spec.type === ODHDocType.HowTo) {
+    if (odhDoc.spec.type === OdhDocumentType.HowTo) {
       return (
         <a
           className="odh-card__footer__link"

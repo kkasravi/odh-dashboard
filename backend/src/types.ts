@@ -87,7 +87,7 @@ export type KubeFastifyInstance = FastifyInstance & {
  */
 
 /*
-export interface RhodsApplication {
+export interface OdhApplication {
   apiVersion?: string;
   kind?: string;
   metadata?: {
@@ -141,14 +141,14 @@ export interface RhodsApplication {
   [k: string]: unknown;
 }
 
-export enum RhodsDocumentType {
+export enum OdhDocumentType {
   Documentation = 'documentation',
   HowTo = 'how-to',
   QuickStart = 'quickstart',
   Tutorial = 'tutorial',
 }
 
-export interface RhodsDocument {
+export interface OdhDocument {
   apiVersion?: string;
   kind?: string;
   metadata?: {
@@ -176,7 +176,7 @@ export interface RhodsDocument {
 }
 */
 
-export type ODHGettingStarted = {
+export type OdhGettingStarted = {
   appName: string;
   markdown: string;
 };

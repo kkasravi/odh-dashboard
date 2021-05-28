@@ -2,7 +2,8 @@
  * Common types, should be kept up to date with backend types
  */
 
-export interface ODHApp {
+/*
+export interface OdhApp {
   apiVersion?: string;
   kind?: string;
   metadata?: {
@@ -55,15 +56,17 @@ export interface ODHApp {
   };
   [k: string]: unknown;
 }
+*/
 
-export enum ODHDocType {
+export enum OdhDocumentType {
   Documentation = 'documentation',
   HowTo = 'how-to',
   QuickStart = 'quickstart',
   Tutorial = 'tutorial',
 }
 
-export interface ODHDoc {
+/*
+export interface OdhDoc {
   apiVersion?: string;
   kind?: string;
   metadata?: {
@@ -89,8 +92,9 @@ export interface ODHDoc {
   };
   [k: string]: unknown;
 }
+*/
 
-export type ODHGettingStarted = {
+export type OdhGettingStarted = {
   appName: string;
   markDown: string;
 };

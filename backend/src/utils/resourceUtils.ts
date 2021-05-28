@@ -6,15 +6,15 @@ import {
   KfDefResource,
   KubeFastifyInstance,
 } from '../types';
-import { RhodsApplication } from '../gen/io.openshift.console.applications.v1alpha1';
-import { RhodsDocument } from '../gen/io.openshift.console.documents.v1alpha1';
+import { OdhApplication } from '../gen/io.openshift.console.applications.v1alpha1';
+import { OdhDocument } from '../gen/io.openshift.console.documents.v1alpha1';
 import { ResourceWatcher } from './resourceWatcher';
 import { getComponentFeatureFlags } from './features';
 
 let operatorWatcher: ResourceWatcher<CSVKind>;
 let serviceWatcher: ResourceWatcher<K8sResourceCommon>;
-let appWatcher: ResourceWatcher<RhodsApplication>;
-let docWatcher: ResourceWatcher<RhodsDocument>;
+let appWatcher: ResourceWatcher<OdhApplication>;
+let docWatcher: ResourceWatcher<OdhDocument>;
 let kfDefWatcher: ResourceWatcher<KfDefApplication>;
 
 const fetchInstalledOperators = (fastify: KubeFastifyInstance): Promise<CSVKind[]> => {
@@ -76,78 +76,78 @@ const fetchInstalledKfdefs = async (fastify: KubeFastifyInstance): Promise<KfDef
   return kfdef?.spec?.applications || [];
 };
 
-const fetchRhodsApplications = async (
+const fetchOdhApplications = async (
   fastify: KubeFastifyInstance,
-): Promise<RhodsApplication[]> => {
+): Promise<OdhApplication[]> => {
   const customObjectsApi = fastify.kube.customObjectsApi;
   const namespace = fastify.kube.namespace;
   const featureFlags = getComponentFeatureFlags();
 
-  let rhodsApplications: RhodsApplication[];
+  let odhApplications: OdhApplication[];
   try {
     const res = await customObjectsApi.listNamespacedCustomObject(
       'applications.console.openshift.io',
       'v1alpha1',
       namespace,
-      'rhodsapplications',
+      'odhapplications',
     );
-    const cas = (res?.body as { items: RhodsApplication[] })?.items;
-    rhodsApplications = cas.reduce((acc, ca) => {
+    const cas = (res?.body as { items: OdhApplication[] })?.items;
+    odhApplications = cas.reduce((acc, ca) => {
       if (!ca.spec.featureFlag || featureFlags[ca.spec.featureFlag]) {
         acc.push(ca);
       }
       return acc;
     }, []);
   } catch (e) {
-    fastify.log.error(e, 'failed to get rhodsapplications');
-    const error = createError(500, 'failed to get rhodsapplications');
+    fastify.log.error(e, 'failed to get odhapplications');
+    const error = createError(500, 'failed to get odhapplications');
     error.explicitInternalServerError = true;
-    error.error = 'failed to get rhodsapplications';
+    error.error = 'failed to get odhapplications';
     error.message =
-      'Unable to get RhodsApplication resources. Please ensure the Open Data Hub operator has been installed.';
+      'Unable to get OdhApplication resources. Please ensure the Open Data Hub operator has been installed.';
     throw error;
   }
-  return Promise.resolve(rhodsApplications);
+  return Promise.resolve(odhApplications);
 };
 
-const fetchRhodsDocuments = async (fastify: KubeFastifyInstance): Promise<RhodsDocument[]> => {
+const fetchOdhDocuments = async (fastify: KubeFastifyInstance): Promise<OdhDocument[]> => {
   const customObjectsApi = fastify.kube.customObjectsApi;
   const namespace = fastify.kube.namespace;
   const featureFlags = getComponentFeatureFlags();
 
-  let rhodsDocuments: RhodsDocument[];
+  let odhDocuments: OdhDocument[];
   try {
     const res = await customObjectsApi.listNamespacedCustomObject(
       'documents.console.openshift.io',
       'v1alpha1',
       namespace,
-      'rhodsdocuments',
+      'odhdocuments',
     );
-    const cas = (res?.body as { items: RhodsDocument[] })?.items;
-    rhodsDocuments = cas.reduce((acc, cd) => {
+    const cas = (res?.body as { items: OdhDocument[] })?.items;
+    odhDocuments = cas.reduce((acc, cd) => {
       if (!cd.spec.featureFlag || featureFlags[cd.spec.featureFlag]) {
         acc.push(cd);
       }
       return acc;
     }, []);
   } catch (e) {
-    fastify.log.error(e, 'failed to get rhodsdocuments');
-    const error = createError(500, 'failed to get rhodsdocuments');
+    fastify.log.error(e, 'failed to get odhdocuments');
+    const error = createError(500, 'failed to get odhdocuments');
     error.explicitInternalServerError = true;
-    error.error = 'failed to get rhodsdocuments';
+    error.error = 'failed to get odhdocuments';
     error.message =
-      'Unable to get RhodsDocument resources. Please ensure the Open Data Hub operator has been installed.';
+      'Unable to get OdhDocument resources. Please ensure the Open Data Hub operator has been installed.';
     throw error;
   }
-  return Promise.resolve(rhodsDocuments);
+  return Promise.resolve(odhDocuments);
 };
 
 export const initializeWatchedResources = (fastify: KubeFastifyInstance): void => {
   operatorWatcher = new ResourceWatcher<CSVKind>(fastify, fetchInstalledOperators);
   serviceWatcher = new ResourceWatcher<K8sResourceCommon>(fastify, fetchServices);
   kfDefWatcher = new ResourceWatcher<KfDefApplication>(fastify, fetchInstalledKfdefs);
-  appWatcher = new ResourceWatcher<RhodsApplication>(fastify, fetchRhodsApplications);
-  docWatcher = new ResourceWatcher<RhodsDocument>(fastify, fetchRhodsDocuments);
+  appWatcher = new ResourceWatcher<OdhApplication>(fastify, fetchOdhApplications);
+  docWatcher = new ResourceWatcher<OdhDocument>(fastify, fetchOdhDocuments);
 };
 
 export const getInstalledOperators = (): K8sResourceCommon[] => {
@@ -162,15 +162,15 @@ export const getInstalledKfdefs = (): KfDefApplication[] => {
   return kfDefWatcher.getResources();
 };
 
-export const getApplicationDefs = (): RhodsApplication[] => {
+export const getApplicationDefs = (): OdhApplication[] => {
   return appWatcher.getResources();
 };
 
-export const getApplicationDef = (appName: string): RhodsApplication => {
+export const getApplicationDef = (appName: string): OdhApplication => {
   const appDefs = getApplicationDefs();
   return appDefs.find((appDef) => appDef.metadata.name === appName);
 };
 
-export const getDocs = (): RhodsDocument[] => {
+export const getDocs = (): OdhDocument[] => {
   return docWatcher.getResources();
 };

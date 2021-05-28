@@ -3,7 +3,7 @@ import { IncomingMessage } from 'http';
 import { CoreV1Api, V1Secret } from '@kubernetes/client-node';
 import { FastifyRequest } from 'fastify';
 import { KubeFastifyInstance } from '../../../types';
-import { RhodsApplication } from '../../../gen/io.openshift.console.applications.v1alpha1';
+import { OdhApplication } from '../../../gen/io.openshift.console.applications.v1alpha1';
 import { getApplicationDef } from '../../../utils/resourceUtils';
 
 const doSleep = (timeout: number) => {
@@ -43,7 +43,7 @@ const waitOnCompletion = async (reader: () => Promise<boolean>): Promise<boolean
 };
 
 export const createAccessSecret = async (
-  appDef: RhodsApplication,
+  appDef: OdhApplication,
   namespace: string,
   stringData: { [key: string]: string },
   coreV1Api: CoreV1Api,
