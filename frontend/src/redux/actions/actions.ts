@@ -12,7 +12,8 @@ export const getUserPending = (): GetUserAction => ({
 export const getUserFulfilled = (response: { kube: { currentUser: string } }): GetUserAction => ({
   type: Actions.GET_USER_FULFILLED,
   payload: {
-    user: response.kube.currentUser,
+    user: response.kube.userName,
+    clusterID: response.kube.clusterID,
   },
 });
 

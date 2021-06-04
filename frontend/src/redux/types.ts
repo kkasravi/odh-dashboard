@@ -24,6 +24,7 @@ export interface GetUserAction {
   type: string;
   payload: {
     user?: string;
+    clusterID?: string;
     error?: Error | null;
     notification?: AppNotification;
   };
