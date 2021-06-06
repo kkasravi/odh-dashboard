@@ -16,9 +16,9 @@ spec:
 apiVersion: image.openshift.io/v1
 kind: ImageStream
 metadata:
-  name: s2i-odh-dashboard # {"$openapi":"IMAGE_NAME"}
+  name: s2i-kam-dashboard # {"$openapi":"IMAGE_NAME"}
   labels:
-    build: s2i-odh-dashboard # {"$openapi":"IMAGE_NAME"}
+    build: s2i-kam-dashboard # {"$openapi":"IMAGE_NAME"}
 spec:
   lookupPolicy:
     local: true

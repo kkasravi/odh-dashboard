@@ -7,7 +7,7 @@ openAPI:
       x-k8s-cli:
         setter:
           name: DASHBOARD_NAME
-          value: odh-dashboard
+          value: kam-dashboard
           isSet: true
           required: true
     io.k8s.cli.setters.NAMESPACE_NAME:
@@ -15,7 +15,7 @@ openAPI:
       x-k8s-cli:
         setter:
           name: NAMESPACE_NAME
-          value: redhat-ods-applications
+          value: kam
           isSet: true
           required: true
     io.k8s.cli.setters.ROUTE_NAMESPACE:
@@ -31,7 +31,7 @@ openAPI:
       x-k8s-cli:
         setter:
           name: IMAGE_NAME
-          value: s2i-odh-dashboard
+          value: s2i-kam-dashboard
           isSet: true
           required: true
     io.k8s.cli.setters.TAG_NAME:
@@ -48,7 +48,7 @@ openAPI:
       x-k8s-cli:
         setter:
           name: REPLICAS
-          value: "2"
+          value: "1"
           isSet: true
           required: true
     io.k8s.cli.substitutions.IMAGE_TAG:

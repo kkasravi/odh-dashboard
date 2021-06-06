@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
 - ../../base
 commonLabels:
-  app: odh-dashboard # {"$openapi":"DASHBOARD_NAME"}
+  app: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}

@@ -3,4 +3,4 @@ kind: Kustomization
 resources:
 - image-stream.yaml
 - build-config.yaml
-namespace: redhat-ods-applications
+namespace: kam

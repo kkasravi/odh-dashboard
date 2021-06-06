@@ -7,7 +7,7 @@ openAPI:
       x-k8s-cli:
         setter:
           name: IMAGE_NAME
-          value: s2i-odh-dashboard
+          value: s2i-kam-dashboard
           isSet: true
           required: true
     io.k8s.cli.setters.TAG_NAME:
