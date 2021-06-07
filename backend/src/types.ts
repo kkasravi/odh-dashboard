@@ -6,9 +6,7 @@ import { FastifyInstance } from 'fastify';
 export declare type QuickStart = {
   apiVersion?: string;
   kind?: string;
-  metadata: {
-    name: string;
-  };
+  metadata?: k8s.V1ObjectMeta;
   spec: {
     version?: number;
     displayName: string;
@@ -23,11 +21,7 @@ export declare type QuickStart = {
 export type K8sResourceCommon = {
   apiVersion?: string;
   kind?: string;
-  metadata?: {
-    name?: string;
-    namespace?: string;
-    uid?: string;
-  };
+  metadata?: k8s.V1ObjectMeta;
 };
 
 // Minimal type for routes
@@ -88,9 +82,9 @@ export type KubeFastifyInstance = FastifyInstance & {
  */
 
 export type OdhApplication = {
-  metadata: {
-    name: string;
-  };
+  apiVersion?: string;
+  kind?: string;
+  metadata?: k8s.V1ObjectMeta;
   spec: {
     displayName: string;
     provider: string;
@@ -134,11 +128,11 @@ export enum OdhDocumentType {
 }
 
 export type OdhDocument = {
-  metadata: {
-    name: string;
-    type: string;
-  };
+  apiVersion?: string;
+  kind?: string;
+  metadata?: k8s.V1ObjectMeta;
   spec: {
+    type: string;
     displayName: string;
     appName?: string;
     provider?: string;

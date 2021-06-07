@@ -19,13 +19,13 @@ const OdhExploreCard: React.FC<OdhExploreCardProps> = ({ odhApp, isSelected, onS
 
   React.useEffect(() => {
     if (isSelected) {
-      makeCardVisible(odhApp.metadata.name);
+      makeCardVisible(odhApp.metadata?.name!);
     }
-  }, [odhApp.metadata.name, isSelected]);
+  }, [odhApp.metadata?.name, isSelected]);
 
   return (
     <Card
-      id={odhApp.metadata.name}
+      id={odhApp.metadata?.name!}
       isHoverable={!odhApp.spec.comingSoon}
       isSelectable={!odhApp.spec.comingSoon}
       isSelected={isSelected}

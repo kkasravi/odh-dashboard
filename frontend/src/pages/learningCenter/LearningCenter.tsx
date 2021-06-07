@@ -67,10 +67,10 @@ const LearningCenterInner: React.FC<LearningCenterInnerProps> = React.memo(
           <Gallery className="odh-explore-apps__gallery" hasGutter>
             {filteredDocApps.map((doc) => (
               <OdhDocCard
-                key={`${doc.metadata.name}`}
+                key={`${doc.metadata?.name!}`}
                 odhDoc={doc}
-                favorite={favorites.includes(doc.metadata.name)}
-                updateFavorite={(isFavorite) => updateFavorite(isFavorite, doc.metadata.name)}
+                favorite={favorites.includes(doc.metadata?.name!)}
+                updateFavorite={(isFavorite) => updateFavorite(isFavorite, doc.metadata?.name!)}
               />
             ))}
           </Gallery>
@@ -108,7 +108,7 @@ const LearningCenter: React.FC = () => {
     if (loaded && !loadError && docsLoaded && !docsLoadError) {
       const updatedDocApps = odhDocs.map((odhDoc) => {
         if (!odhDoc.spec.img || !odhDoc.spec.description) {
-          const odhApp = components.find((c) => c.metadata.name === odhDoc.spec.appName);
+          const odhApp = components.find((c) => c.metadata?.name! === odhDoc.spec.appName);
           if (odhApp) {
             const updatedDoc = _.cloneDeep(odhDoc);
             updatedDoc.spec.img = odhDoc.spec.img || odhApp.spec.img;
@@ -125,11 +125,11 @@ const LearningCenter: React.FC = () => {
         if (component.spec.docsLink) {
           const odhDoc: OdhDocument = {
             metadata: {
-              name: `${component.metadata.name}-doc`,
-              type: OdhDocumentType.Documentation,
+              name: `${component.metadata?.name!}-doc`,
             },
             spec: {
-              appName: component.metadata.name,
+              type: OdhDocumentType.Documentation,
+              appName: component.metadata?.name!,
               provider: component.spec.provider,
               url: component.spec.docsLink,
               displayName: component.spec.displayName,
@@ -156,11 +156,11 @@ const LearningCenter: React.FC = () => {
   React.useEffect(() => {
     setFilteredDocApps(
       docApps
-        .filter((doc) => doc.metadata.type !== 'getting-started')
+        .filter((doc) => doc.spec.type !== 'getting-started')
         .filter((doc) => doesDocAppMatch(doc, searchQuery, typeFilters))
         .sort((a, b) => {
-          const aFav = favoriteResources.includes(a.metadata.name);
-          const bFav = favoriteResources.includes(b.metadata.name);
+          const aFav = favoriteResources.includes(a.metadata?.name!);
+          const bFav = favoriteResources.includes(b.metadata?.name!);
           if (aFav && !bFav) {
             return -1;
           }
@@ -170,7 +170,7 @@ const LearningCenter: React.FC = () => {
           let sortVal =
             sortType === SORT_TYPE_NAME
               ? a.spec.displayName.localeCompare(b.spec.displayName)
-              : a.metadata.type.localeCompare(b.metadata.type);
+              : a.spec.type!.localeCompare(b.spec.type!);
           if (sortOrder === SORT_DESC) {
             sortVal *= -1;
           }
@@ -179,8 +179,8 @@ const LearningCenter: React.FC = () => {
     );
     const docCounts = docApps.reduce(
       (acc, docApp) => {
-        if (acc[docApp.metadata.type] !== undefined) {
-          acc[docApp.metadata.type]++;
+        if (acc[docApp.spec.type!] !== undefined) {
+          acc[docApp.spec.type!]++;
         }
         return acc;
       },

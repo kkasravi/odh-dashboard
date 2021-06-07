@@ -33,7 +33,7 @@ const EnabledApplicationsInner: React.FC<EnabledApplicationsInnerProps> = React.
             <PageSection>
               <Gallery className="odh-installed-apps__gallery" hasGutter>
                 {components.map((c) => (
-                  <OdhAppCard key={c.metadata.name} odhApp={c} />
+                  <OdhAppCard key={c.metadata?.name!} odhApp={c} />
                 ))}
               </Gallery>
             </PageSection>

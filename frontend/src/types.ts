@@ -1,11 +1,12 @@
+import k8s from '@kubernetes/client-node';
 /*
  * Common types, should be kept up to date with backend types
  */
 
 export type OdhApplication = {
-  metadata: {
-    name: string;
-  };
+  apiVersion?: string;
+  kind?: string;
+  metadata?: k8s.V1ObjectMeta;
   spec: {
     displayName: string;
     provider: string;
@@ -49,11 +50,11 @@ export enum OdhDocumentType {
 }
 
 export type OdhDocument = {
-  metadata: {
-    name: string;
-    type: string;
-  };
+  apiVersion?: string;
+  kind?: string;
+  metadata?: k8s.V1ObjectMeta;
   spec: {
+    type?: string;
     displayName: string;
     appName?: string;
     provider?: string;

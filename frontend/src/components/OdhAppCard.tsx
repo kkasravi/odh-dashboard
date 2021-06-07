@@ -33,9 +33,9 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
 
   React.useEffect(() => {
     if (selected) {
-      makeCardVisible(odhApp.metadata.name);
+      makeCardVisible(odhApp.metadata?.name!);
     }
-  }, [odhApp.metadata.name, selected]);
+  }, [odhApp.metadata?.name, selected]);
 
   const onToggle = (value) => {
     setIsOpen(value);
@@ -48,7 +48,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
   const onQuickStart = (e) => {
     e.preventDefault();
     launchQuickStart(odhApp.spec.quickStart, qsContext);
-    makeCardVisible(odhApp.metadata.name);
+    makeCardVisible(odhApp.metadata?.name!);
   };
 
   const dropdownItems = [
@@ -105,7 +105,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
 
   return (
     <Card
-      id={odhApp.metadata.name}
+      id={odhApp.metadata?.name}
       isHoverable
       className="odh-card odh-tourable-card"
       isSelected={selected}

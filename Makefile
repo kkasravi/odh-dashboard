@@ -34,11 +34,19 @@ dev:
 
 ##################################
 
-# BUILD - build image locally using s2i
+# BUILD - build image in OC_PROJECT using BuildConfig, ImageStream
 
 .PHONY: build
 build:
-	./install/build.sh
+	cd install/build && make undeploy deploy
+
+##################################
+
+# BUILD-LOCAL - build image using s2i, also requires push
+
+.PHONY: build-local
+build-local:
+	./install/build-local.sh
 
 ##################################
 

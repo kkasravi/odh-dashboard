@@ -54,10 +54,10 @@ const ExploreApplicationsInner: React.FC<ExploreApplicationsInnerProps> = React.
                   <Gallery className="odh-explore-apps__gallery" hasGutter>
                     {exploreComponents.map((c) => (
                       <OdhExploreCard
-                        key={c.metadata.name}
+                        key={c.metadata?.name!}
                         odhApp={c}
                         isSelected={selectedComponent === c}
-                        onSelect={() => updateSelection(c.metadata.name)}
+                        onSelect={() => updateSelection(c.metadata?.name!)}
                       />
                     ))}
                   </Gallery>
@@ -82,7 +82,7 @@ const ExploreApplications: React.FC = () => {
 
   const updateSelection = React.useCallback(
     (selectedId?: string | null): void => {
-      const selection = components.find((c) => c.metadata.name && c.metadata.name === selectedId);
+      const selection = components.find((c) => c.metadata?.name && c.metadata?.name! === selectedId);
       if (selectedId && selection) {
         setQueryArgument(history, 'selectId', selectedId);
         setSelectedComponent(selection);

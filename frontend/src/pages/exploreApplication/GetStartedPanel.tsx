@@ -32,7 +32,7 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose 
   const [loadError, setLoadError] = React.useState<Error>();
   const [odhGettingStarted, setOdhGettingStarted] = React.useState<OdhGettingStarted>();
   const [enableOpen, setEnableOpen] = React.useState<boolean>(false);
-  const appName = selectedApp?.metadata.name;
+  const appName = selectedApp?.metadata?.name!;
 
   React.useEffect(() => {
     if (appName) {

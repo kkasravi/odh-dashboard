@@ -45,7 +45,7 @@ const EnableModal: React.FC<EnableModalProps> = ({ selectedApp, onClose }) => {
   const onDoEnableApp = () => {
     setPostError(false);
     setValidationInProgress(true);
-    postValidateIsv(selectedApp.metadata.name, enableValues)
+    postValidateIsv(selectedApp.metadata?.name!, enableValues)
       .then((valid) => {
         setValidationInProgress(false);
         if (valid) {
