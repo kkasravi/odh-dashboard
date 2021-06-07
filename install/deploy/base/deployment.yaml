@@ -11,8 +11,6 @@ spec:
     metadata:
       labels:
         deployment: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
-      annotations:
-        alpha.image.policy.openshift.io/resolve-names: '*'
     spec:
       serviceAccount: kam-dashboard # {"$openapi":"DASHBOARD_NAME"}
       containers:
