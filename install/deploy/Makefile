@@ -36,4 +36,4 @@ deploy: output-vars set-project set-dashboard-name set-namespace set-route-names
 undeploy:output-vars set-project set-dashboard-name set-namespace set-route-namespace set-image set-replicas 
 	kustomize build | kubectl delete -f - -l 'app in ('$(DASHBOARD_NAME)')'
 
-reset: output-vars set-project set-dashboard-name set-namespace set-route-namespace set-image set-replicas
+defaults: output-vars set-project set-dashboard-name set-namespace set-route-namespace set-image set-replicas

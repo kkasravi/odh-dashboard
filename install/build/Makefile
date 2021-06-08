@@ -20,4 +20,4 @@ deploy:: output-vars set-namespace set-image-tag
 undeploy: output-vars set-namespace set-image-tag
 	kustomize build | kubectl delete -f - || exit 0
 
-reset: output-vars set-namespace set-image-tag
+defaults: output-vars set-namespace set-image-tag

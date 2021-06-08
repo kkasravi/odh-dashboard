@@ -24,7 +24,7 @@ openAPI:
           name: IMAGE_TAG
           pattern: ${IMAGE_NAME}:${TAG_NAME}
           values:
-          - marker: ${IMAGE_NAME}
-            ref: '#/definitions/io.k8s.cli.setters.IMAGE_NAME'
-          - marker: ${TAG_NAME}
-            ref: '#/definitions/io.k8s.cli.setters.TAG_NAME'
+            - marker: ${IMAGE_NAME}
+              ref: '#/definitions/io.k8s.cli.setters.IMAGE_NAME'
+            - marker: ${TAG_NAME}
+              ref: '#/definitions/io.k8s.cli.setters.TAG_NAME'

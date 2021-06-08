@@ -77,7 +77,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc, favorite, updateFavorit
     if (odhDoc.spec.type === OdhDocumentType.QuickStart) {
       return (
         <a className="odh-card__footer__link" href="#" onClick={onQuickStart}>
-          {getQuickStartLabel(odhDoc.metadata.name, qsContext)}
+          {getQuickStartLabel(odhDoc.metadata?.name!, qsContext)}
         </a>
       );
     }
@@ -100,7 +100,7 @@ const OdhDocCard: React.FC<OdhDocCardProps> = ({ odhDoc, favorite, updateFavorit
   const favoriteClasses = classNames('odh-dashboard__favorite', { 'm-is-favorite': favorite });
   return (
     <Card
-      id={odhDoc.metadata.name}
+      id={odhDoc.metadata?.name!}
       isHoverable
       className="odh-card odh-tourable-card"
       isSelected={selected}

@@ -96,7 +96,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
 
   return (
     <Card
-      id={odhApp.metadata.name}
+      id={odhApp.metadata?.name!}
       isHoverable
       className="odh-card odh-tourable-card"
       isSelected={selected}

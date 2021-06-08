@@ -56,8 +56,12 @@ rules:
   resources:
   - odhapplications
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
 - apiGroups:
   - applications.console.openshift.io
@@ -78,8 +82,12 @@ rules:
   resources:
   - odhdocuments
   verbs:
+  - create
+  - delete
   - get
   - list
+  - patch
+  - update
   - watch
 - apiGroups:
   - documents.console.openshift.io

@@ -6,12 +6,12 @@ spec:
   lookupPolicy:
     local: false
   tags:
-  - from:
-      kind: DockerImage
-      name: registry.access.redhat.com/ubi8/nodejs-14:1-28
-    name: 1-28
-    referencePolicy:
-      type: Source
+    - from:
+        kind: DockerImage
+        name: registry.access.redhat.com/ubi8/nodejs-14:1-28
+      name: 1-28
+      referencePolicy:
+        type: Source
 ---
 apiVersion: image.openshift.io/v1
 kind: ImageStream
