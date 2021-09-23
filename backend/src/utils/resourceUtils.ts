@@ -2,9 +2,14 @@ import * as jsYaml from 'js-yaml';
 import createError from 'http-errors';
 import fs from 'fs';
 import path from 'path';
+import { V1ConfigMap } from '@kubernetes/client-node';
 import {
+  BUILD_PHASE,
+  BuildKind,
   BuildStatus,
+  ConsoleLinkKind,
   CSVKind,
+  DashboardConfig,
   K8sResourceCommon,
   KfDefApplication,
   KfDefResource,
@@ -20,12 +25,38 @@ import {
 import { getComponentFeatureFlags } from './features';
 import { yamlRegExp } from './constants';
 
+const dashboardConfigMapName = 'odh-dashboard-config';
+const consoleLinksGroup = 'console.openshift.io';
+const consoleLinksVersion = 'v1';
+const consoleLinksPlural = 'consolelinks';
+
+let dashboardConfigWatcher: ResourceWatcher<V1ConfigMap>;
 let operatorWatcher: ResourceWatcher<CSVKind>;
 let serviceWatcher: ResourceWatcher<K8sResourceCommon>;
 let appWatcher: ResourceWatcher<OdhApplication>;
 let docWatcher: ResourceWatcher<OdhDocument>;
 let kfDefWatcher: ResourceWatcher<KfDefApplication>;
 let buildsWatcher: ResourceWatcher<BuildStatus>;
+let consoleLinksWatcher: ResourceWatcher<ConsoleLinkKind>;
+
+const DEFAULT_DASHBOARD_CONFIG: V1ConfigMap = {
+  metadata: {
+    name: dashboardConfigMapName,
+    namespace: 'default',
+  },
+  data: {
+    enablement: 'true',
+    disableInfo: 'false',
+    disableSupport: 'false',
+  },
+};
+
+const fetchDashboardConfigMap = (fastify: KubeFastifyInstance): Promise<V1ConfigMap[]> => {
+  return fastify.kube.coreV1Api
+    .readNamespacedConfigMap(dashboardConfigMapName, fastify.kube.namespace)
+    .then((result) => [result.body])
+    .catch(() => [DEFAULT_DASHBOARD_CONFIG]);
+};
 
 const fetchInstalledOperators = (fastify: KubeFastifyInstance): Promise<CSVKind[]> => {
   return fastify.kube.customObjectsApi
@@ -134,10 +165,32 @@ const fetchDocs = async (): Promise<OdhDocument[]> => {
   return Promise.resolve(docs);
 };
 
+const getBuildNumber = (build: BuildKind): number => {
+  const buildNumber = build.metadata.annotations?.['openshift.io/build.number'];
+  return !!buildNumber && parseInt(buildNumber, 10);
+};
+
+const PENDING_PHASES = [BUILD_PHASE.new, BUILD_PHASE.pending, BUILD_PHASE.cancelled];
+
+const compareBuilds = (b1: BuildKind, b2: BuildKind) => {
+  const b1Pending = PENDING_PHASES.includes(b1.status.phase);
+  const b2Pending = PENDING_PHASES.includes(b2.status.phase);
+
+  if (b1Pending && !b2Pending) {
+    return -1;
+  }
+  if (b2Pending && !b1Pending) {
+    return 1;
+  }
+  return getBuildNumber(b1) - getBuildNumber(b2);
+};
+
 const getBuildConfigStatus = (
   fastify: KubeFastifyInstance,
-  bcName: string,
+  buildConfig: K8sResourceCommon,
 ): Promise<BuildStatus> => {
+  const bcName = buildConfig.metadata.name;
+  const notebookName = buildConfig.metadata.labels?.['opendatahub.io/notebook-name'] || bcName;
   return fastify.kube.customObjectsApi
     .listNamespacedCustomObject(
       'build.openshift.io',
@@ -151,41 +204,32 @@ const getBuildConfigStatus = (
     )
     .then((res) => {
       const bcBuilds = (res?.body as {
-        items: {
-          metadata: { name: string };
-          status: { phase: string; completionTimestamp: string; startTimestamp: string };
-        }[];
+        items: BuildKind[];
       })?.items;
       if (bcBuilds.length === 0) {
         return {
-          name: bcName,
-          status: 'pending',
+          name: notebookName,
+          status: BUILD_PHASE.none,
         };
       }
-      const mostRecent = bcBuilds
-        .sort((bc1, bc2) => {
-          const name1 = parseInt(bc1.metadata.name.split('_').pop());
-          const name2 = parseInt(bc2.metadata.name.split('_').pop());
-          return name1 - name2;
-        })
-        .pop();
+      const mostRecent = bcBuilds.sort(compareBuilds).pop();
       return {
-        name: bcName,
+        name: notebookName,
         status: mostRecent.status.phase,
         timestamp: mostRecent.status.completionTimestamp || mostRecent.status.startTimestamp,
       };
     })
     .catch((e) => {
-      console.dir(e);
+      fastify.log.error(e.response?.body?.message || e.message);
       return {
-        name: bcName,
-        status: 'pending',
+        name: notebookName,
+        status: BUILD_PHASE.pending,
       };
     });
 };
 
 export const fetchBuilds = async (fastify: KubeFastifyInstance): Promise<BuildStatus[]> => {
-  const nbBuildConfigNames: string[] = await fastify.kube.customObjectsApi
+  const buildConfigs: K8sResourceCommon[] = await fastify.kube.customObjectsApi
     .listNamespacedCustomObject(
       'build.openshift.io',
       'v1',
@@ -197,35 +241,14 @@ export const fetchBuilds = async (fastify: KubeFastifyInstance): Promise<BuildSt
       'opendatahub.io/build_type=notebook_image',
     )
     .then((res) => {
-      const buildConfigs = (res?.body as { items: { metadata: { name: string } }[] })?.items;
-      return buildConfigs.map((bc) => bc.metadata.name);
-    })
-    .catch(() => {
-      return [];
-    });
-  const baseBuildConfigNames: string[] = await fastify.kube.customObjectsApi
-    .listNamespacedCustomObject(
-      'build.openshift.io',
-      'v1',
-      fastify.kube.namespace,
-      'buildconfigs',
-      undefined,
-      undefined,
-      undefined,
-      'opendatahub.io/build_type=base_image',
-    )
-    .then((res) => {
-      const buildConfigs = (res?.body as { items: { metadata: { name: string } }[] })?.items;
-      return buildConfigs.map((bc) => bc.metadata.name);
+      return (res?.body as { items: K8sResourceCommon[] })?.items;
     })
     .catch(() => {
       return [];
     });
 
-  const buildConfigNames = [...nbBuildConfigNames, ...baseBuildConfigNames];
-
-  const getters = buildConfigNames.map(async (name) => {
-    return getBuildConfigStatus(fastify, name);
+  const getters = buildConfigs.map(async (buildConfig) => {
+    return getBuildConfigStatus(fastify, buildConfig);
   });
 
   return Promise.all(getters);
@@ -243,13 +266,36 @@ const getRefreshTimeForBuilds = (buildStatuses: BuildStatus[]): ResourceWatcherT
   return { activeWatchInterval: DEFAULT_ACTIVE_TIMEOUT };
 };
 
+const fetchConsoleLinks = async (fastify: KubeFastifyInstance) => {
+  return fastify.kube.customObjectsApi
+    .listClusterCustomObject(consoleLinksGroup, consoleLinksVersion, consoleLinksPlural)
+    .then((res) => {
+      return (res.body as { items: ConsoleLinkKind[] }).items;
+    })
+    .catch((e) => {
+      fastify.log.error(e, 'failed to get ConsoleLinks');
+      return [];
+    });
+};
+
 export const initializeWatchedResources = (fastify: KubeFastifyInstance): void => {
+  dashboardConfigWatcher = new ResourceWatcher<V1ConfigMap>(fastify, fetchDashboardConfigMap);
   operatorWatcher = new ResourceWatcher<CSVKind>(fastify, fetchInstalledOperators);
   serviceWatcher = new ResourceWatcher<K8sResourceCommon>(fastify, fetchServices);
   kfDefWatcher = new ResourceWatcher<KfDefApplication>(fastify, fetchInstalledKfdefs);
   appWatcher = new ResourceWatcher<OdhApplication>(fastify, fetchApplicationDefs);
   docWatcher = new ResourceWatcher<OdhDocument>(fastify, fetchDocs);
   buildsWatcher = new ResourceWatcher<BuildStatus>(fastify, fetchBuilds, getRefreshTimeForBuilds);
+  consoleLinksWatcher = new ResourceWatcher<ConsoleLinkKind>(fastify, fetchConsoleLinks);
+};
+
+export const getDashboardConfig = (): DashboardConfig => {
+  const config = dashboardConfigWatcher.getResources()?.[0] ?? DEFAULT_DASHBOARD_CONFIG;
+  return {
+    enablement: (config.data?.enablement ?? '').toLowerCase() !== 'false',
+    disableInfo: (config.data?.disableInfo ?? '').toLowerCase() === 'true',
+    disableSupport: (config.data?.disableSupport ?? '').toLowerCase() === 'true',
+  };
 };
 
 export const getInstalledOperators = (): K8sResourceCommon[] => {
@@ -263,8 +309,13 @@ export const getServices = (): K8sResourceCommon[] => {
 export const getInstalledKfdefs = (): KfDefApplication[] => {
   return kfDefWatcher.getResources();
 };
+
 export const getApplicationDefs = (): OdhApplication[] => {
   return appWatcher.getResources();
+};
+
+export const updateApplicationDefs = (): Promise<void> => {
+  return appWatcher.updateResults();
 };
 
 export const getApplicationDef = (appName: string): OdhApplication => {
@@ -276,6 +327,10 @@ export const getDocs = (): OdhDocument[] => {
   return docWatcher.getResources();
 };
 
-export const getBuildStatuses = (): { name: string; status: string }[] => {
+export const getBuildStatuses = (): BuildStatus[] => {
   return buildsWatcher.getResources();
+};
+
+export const getConsoleLinks = (): ConsoleLinkKind[] => {
+  return consoleLinksWatcher.getResources();
 };

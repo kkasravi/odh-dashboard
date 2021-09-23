@@ -8,11 +8,13 @@ export enum Actions {
   HIDE_NOTIFICATION = 'HIDE_NOTIFICATION',
   ACK_NOTIFICATION = 'ACK_NOTIFICATION',
   REMOVE_NOTIFICATION = 'REMOVE_NOTIFICATION',
+  FORCE_COMPONENTS_UPDATE = 'FORCE_COMPONENTS_UPDATE',
 }
 
+export type AppNotificationStatus = 'success' | 'danger' | 'warning' | 'info' | 'default';
 export interface AppNotification {
   id?: number;
-  status: 'success' | 'danger' | 'warning' | 'info' | 'default';
+  status: AppNotificationStatus;
   title: string;
   message?: React.ReactNode;
   hidden?: boolean;
@@ -34,6 +36,7 @@ export interface AppState {
   user?: string;
   userLoading: boolean;
   userError?: Error | null;
+  clusterID?: string;
   notifications: AppNotification[];
   forceComponentsUpdate: number;
 }

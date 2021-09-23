@@ -1,9 +1,8 @@
 import React from 'react';
-import * as classNames from 'classnames';
 import * as _ from 'lodash';
 import useDimensions from 'react-cool-dimensions';
-import { Gallery, PageSection, PageSectionVariants } from '@patternfly/react-core';
 import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
+import { ExternalLinkAltIcon } from '@patternfly/react-icons';
 import { OdhDocument, OdhDocumentType } from '../../types';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
 import { useWatchDocs } from '../../utilities/useWatchDocs';
@@ -11,142 +10,53 @@ import { useLocalStorage } from '../../utilities/useLocalStorage';
 import { useQueryParams } from '../../utilities/useQueryParams';
 import ApplicationsPage from '../ApplicationsPage';
 import QuickStarts from '../../app/QuickStarts';
-import OdhDocCard from '../../components/OdhDocCard';
-import OdhDocListItem from '../../components/OdhDocListItem';
 import {
   DOC_SORT_KEY,
   DOC_SORT_ORDER_KEY,
-  DOC_TYPE_FILTER_KEY,
-  doesDocAppMatch,
-  SEARCH_FILTER_KEY,
   SORT_ASC,
   SORT_DESC,
   SORT_TYPE_APPLICATION,
   SORT_TYPE_DURATION,
   SORT_TYPE_NAME,
   SORT_TYPE_TYPE,
-} from './learningCenterUtils';
-import LearningCenterListHeader from './LearningCenterListHeader';
+  CARD_VIEW,
+  VIEW_TYPE,
+  FAVORITE_RESOURCES,
+} from './const';
+import LearningCenterToolbar from './LearningCenterToolbar';
 import LearningCenterFilters from './LearningCenterFilters';
-import { CARD_VIEW, LIST_VIEW, VIEW_TYPE } from './const';
+import { useDocFilterer } from './useDocFilterer';
+import { DOC_LINK } from '../../utilities/const';
+import { combineCategoryAnnotations } from '../../utilities/utils';
+import LearningCenterDataView from './LearningCenterDataView';
 
 import './LearningCenter.scss';
 
-export const FAVORITE_RESOURCES = 'ods.dashboard.resources.favorites';
-
 const description = `Access all learning resources for Open Data Hub and supported applications.`;
+const docText = ` To learn more about Open Data Hub, `;
 
-type LearningCenterInnerProps = {
-  loaded: boolean;
-  loadError?: Error;
-  docsLoadError?: Error;
-  docsLoaded: boolean;
-  filteredDocApps: OdhDocument[];
-  docTypeCounts: Record<OdhDocumentType, number>;
-  totalCount: number;
-  favorites: string[];
-  updateFavorite: (isFavorite: boolean, name: string) => void;
-  viewType: string;
-  updateViewType: (updatedType: string) => void;
-};
-
-const LearningCenterInner: React.FC<LearningCenterInnerProps> = React.memo(
-  ({
-    loaded,
-    loadError,
-    docsLoaded,
-    docsLoadError,
-    filteredDocApps,
-    docTypeCounts,
-    totalCount,
-    favorites,
-    updateFavorite,
-    viewType,
-    updateViewType,
-  }) => {
-    const [sizeClass, setSizeClass] = React.useState<string>('m-ods-size-lg');
-    const { observe } = useDimensions({
-      breakpoints: { sm: 0, md: 600, lg: 750 },
-      onResize: ({ currentBreakpoint }) => {
-        setSizeClass(`m-odh-size-${currentBreakpoint}`);
-      },
-    });
-
-    const listViewClasses = classNames('odh-learning-paths__list-view', sizeClass);
-    return (
-      <ApplicationsPage
-        title="Resources"
-        description={description}
-        loaded={loaded && docsLoaded}
-        loadError={loadError || docsLoadError}
-        empty={false}
-      >
-        <LearningCenterFilters
-          count={filteredDocApps.length}
-          totalCount={totalCount}
-          docTypeStatusCount={docTypeCounts}
-          viewType={viewType}
-          updateViewType={updateViewType}
-        />
-        <PageSection
-          variant={viewType === LIST_VIEW ? PageSectionVariants.light : PageSectionVariants.default}
-          hasShadowTop={viewType === LIST_VIEW}
-        >
-          {viewType !== LIST_VIEW ? (
-            <Gallery className="odh-learning-paths__gallery" hasGutter>
-              {filteredDocApps.map((doc) => (
-                <OdhDocCard
-                  key={`${doc.metadata.name}`}
-                  odhDoc={doc}
-                  favorite={favorites.includes(doc.metadata.name)}
-                  updateFavorite={(isFavorite) => updateFavorite(isFavorite, doc.metadata.name)}
-                />
-              ))}
-            </Gallery>
-          ) : (
-            <div className={listViewClasses} aria-label="Simple data list example">
-              <LearningCenterListHeader />
-              {filteredDocApps.map((doc) => (
-                <OdhDocListItem
-                  key={`${doc.metadata.name}`}
-                  odhDoc={doc}
-                  favorite={favorites.includes(doc.metadata.name)}
-                  updateFavorite={(isFavorite) => updateFavorite(isFavorite, doc.metadata.name)}
-                />
-              ))}
-            </div>
-          )}
-        </PageSection>
-        <div ref={observe} />
-      </ApplicationsPage>
-    );
-  },
-);
-LearningCenterInner.displayName = 'LearningCenterInner';
-
-const LearningCenter: React.FC = () => {
+export const LearningCenter: React.FC = () => {
   const { docs: odhDocs, loaded: docsLoaded, loadError: docsLoadError } = useWatchDocs();
   const { components, loaded, loadError } = useWatchComponents(false);
   const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
   const [docApps, setDocApps] = React.useState<OdhDocument[]>([]);
-  const [docTypesCount, setDocTypesCount] = React.useState<Record<OdhDocumentType, number>>({
-    [OdhDocumentType.Documentation]: 0,
-    [OdhDocumentType.HowTo]: 0,
-    [OdhDocumentType.Tutorial]: 0,
-    [OdhDocumentType.QuickStart]: 0,
-  });
   const [filteredDocApps, setFilteredDocApps] = React.useState<OdhDocument[]>([]);
   const queryParams = useQueryParams();
-  const searchQuery = queryParams.get(SEARCH_FILTER_KEY) || '';
-  const filters = queryParams.get(DOC_TYPE_FILTER_KEY);
-  const typeFilters = React.useMemo(() => {
-    return filters?.split(',') || [];
-  }, [filters]);
   const sortType = queryParams.get(DOC_SORT_KEY) || SORT_TYPE_NAME;
   const sortOrder = queryParams.get(DOC_SORT_ORDER_KEY) || SORT_ASC;
   const [favorites, setFavorites] = useLocalStorage(FAVORITE_RESOURCES);
   const favoriteResources = React.useMemo(() => JSON.parse(favorites || '[]'), [favorites]);
+  const docFilterer = useDocFilterer(favoriteResources);
   const [viewType, setViewType] = useLocalStorage(VIEW_TYPE);
+  const [filtersCollapsed, setFiltersCollapsed] = React.useState<boolean>(false);
+  const [filtersCollapsible, setFiltersCollapsible] = React.useState<boolean>(false);
+  const { observe } = useDimensions({
+    breakpoints: { sm: 0, md: 600 },
+    onResize: ({ currentBreakpoint }) => {
+      setFiltersCollapsed(currentBreakpoint === 'sm');
+      setFiltersCollapsible(currentBreakpoint === 'sm');
+    },
+  });
 
   React.useEffect(() => {
     if (loaded && !loadError && docsLoaded && !docsLoadError) {
@@ -180,87 +90,74 @@ const LearningCenter: React.FC = () => {
         docs.push(odhDoc);
       });
 
-      const updatedDocApps = docs.map((odhDoc) => {
-        const odhApp = components.find((c) => c.metadata.name === odhDoc.spec.appName);
-        if (odhApp) {
+      const updatedDocApps = docs
+        .filter((doc) => doc.metadata.type !== 'getting-started')
+        .map((odhDoc) => {
+          const odhApp = components.find((c) => c.metadata.name === odhDoc.spec.appName);
           const updatedDoc = _.cloneDeep(odhDoc);
-          updatedDoc.spec.appDisplayName = odhDoc.spec.appDisplayName || odhApp.spec.displayName;
-          updatedDoc.spec.img = odhDoc.spec.img || odhApp.spec.img;
-          updatedDoc.spec.description = odhDoc.spec.description || odhApp.spec.description;
-          updatedDoc.spec.provider = odhDoc.spec.provider || odhApp.spec.provider;
+          if (odhApp) {
+            combineCategoryAnnotations(odhDoc, odhApp);
+            updatedDoc.spec.appDisplayName = odhApp.spec.displayName;
+            updatedDoc.spec.appEnabled = odhApp.spec.isEnabled ?? false;
+            updatedDoc.spec.img = odhDoc.spec.img || odhApp.spec.img;
+            updatedDoc.spec.description = odhDoc.spec.description || odhApp.spec.description;
+            updatedDoc.spec.provider = odhDoc.spec.provider || odhApp.spec.provider;
+          } else {
+            updatedDoc.spec.appEnabled = false;
+          }
           return updatedDoc;
-        }
-        return odhDoc;
-      });
-
+        });
       setDocApps(updatedDocApps);
     }
   }, [components, loaded, loadError, odhDocs, docsLoaded, docsLoadError, qsContext.allQuickStarts]);
 
   React.useEffect(() => {
+    const filtered = docFilterer(docApps);
     setFilteredDocApps(
-      docApps
-        .filter((doc) => doc.metadata.type !== 'getting-started')
-        .filter((doc) => doesDocAppMatch(doc, searchQuery, typeFilters))
-        .sort((a, b) => {
-          const aFav = favoriteResources.includes(a.metadata.name);
-          const bFav = favoriteResources.includes(b.metadata.name);
-          if (aFav && !bFav) {
-            return -1;
-          }
-          if (!aFav && bFav) {
-            return 1;
-          }
-          let sortVal;
-          switch (sortType) {
-            case SORT_TYPE_NAME:
-              sortVal = a.spec.displayName.localeCompare(b.spec.displayName);
-              break;
-            case SORT_TYPE_TYPE:
-              sortVal = a.metadata.type.localeCompare(b.metadata.type);
-              break;
-            case SORT_TYPE_APPLICATION:
-              if (!a.spec.appDisplayName) {
-                sortVal = -1;
-              } else if (!b.spec.appDisplayName) {
-                sortVal = 1;
-              } else {
-                sortVal = a.spec.appDisplayName.localeCompare(b.spec.appDisplayName);
-              }
-              break;
-            case SORT_TYPE_DURATION:
-              sortVal = (a.spec.durationMinutes || 0) - (b.spec.durationMinutes || 0);
-              break;
-            default:
-              sortVal = a.spec.displayName.localeCompare(b.spec.displayName);
-          }
-          if (sortVal === 0) {
-            sortVal = a.spec.displayName.localeCompare(b.spec.displayName);
-          }
-          if (sortOrder === SORT_DESC) {
-            sortVal *= -1;
-          }
-          return sortVal;
-        }),
-    );
-    const docCounts = docApps.reduce(
-      (acc, docApp) => {
-        if (acc[docApp.metadata.type] !== undefined) {
-          acc[docApp.metadata.type]++;
+      filtered.sort((a, b) => {
+        const aFav = favoriteResources.includes(a.metadata.name);
+        const bFav = favoriteResources.includes(b.metadata.name);
+        if (aFav && !bFav) {
+          return -1;
         }
-        return acc;
-      },
-      {
-        [OdhDocumentType.Documentation]: 0,
-        [OdhDocumentType.HowTo]: 0,
-        [OdhDocumentType.Tutorial]: 0,
-        [OdhDocumentType.QuickStart]: 0,
-      },
+        if (!aFav && bFav) {
+          return 1;
+        }
+        let sortVal;
+        switch (sortType) {
+          case SORT_TYPE_NAME:
+            sortVal = a.spec.displayName.localeCompare(b.spec.displayName);
+            break;
+          case SORT_TYPE_TYPE:
+            sortVal = a.metadata.type.localeCompare(b.metadata.type);
+            break;
+          case SORT_TYPE_APPLICATION:
+            if (!a.spec.appDisplayName) {
+              sortVal = -1;
+            } else if (!b.spec.appDisplayName) {
+              sortVal = 1;
+            } else {
+              sortVal = a.spec.appDisplayName.localeCompare(b.spec.appDisplayName);
+            }
+            break;
+          case SORT_TYPE_DURATION:
+            sortVal = (a.spec.durationMinutes || 0) - (b.spec.durationMinutes || 0);
+            break;
+          default:
+            sortVal = a.spec.displayName.localeCompare(b.spec.displayName);
+        }
+        if (sortVal === 0) {
+          sortVal = a.spec.displayName.localeCompare(b.spec.displayName);
+        }
+        if (sortOrder === SORT_DESC) {
+          sortVal *= -1;
+        }
+        return sortVal;
+      }),
     );
-    setDocTypesCount(docCounts);
     // Do not include favoriteResources change to prevent re-sorting when favoriting/unfavoriting
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [docApps, searchQuery, typeFilters, sortOrder, sortType]);
+  }, [docApps, docFilterer, sortOrder, sortType]);
 
   const updateFavorite = React.useCallback(
     (isFavorite: boolean, name: string): void => {
@@ -280,20 +177,60 @@ const LearningCenter: React.FC = () => {
     [favoriteResources, setFavorites],
   );
 
+  const docLink = DOC_LINK ? (
+    <>
+      {docText}
+      <a
+        className="odh-dashboard__external-link"
+        href={DOC_LINK}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        view the documentation.
+        <ExternalLinkAltIcon />
+      </a>
+    </>
+  ) : null;
+
   return (
-    <LearningCenterInner
-      loaded={loaded}
-      loadError={loadError}
-      docsLoaded={docsLoaded}
-      docsLoadError={docsLoadError}
-      filteredDocApps={filteredDocApps}
-      docTypeCounts={docTypesCount}
-      totalCount={docApps.length}
-      favorites={favoriteResources}
-      updateFavorite={updateFavorite}
-      viewType={viewType || CARD_VIEW}
-      updateViewType={setViewType}
-    />
+    <ApplicationsPage
+      title="Resources"
+      description={
+        <>
+          {description}
+          {docLink}
+        </>
+      }
+      loaded={loaded && docsLoaded}
+      loadError={loadError || docsLoadError}
+      empty={false}
+    >
+      <div className="odh-dashboard__page-content" ref={observe}>
+        <LearningCenterFilters
+          docApps={docApps}
+          collapsible={filtersCollapsible}
+          collapsed={filtersCollapsed}
+          onCollapse={() => setFiltersCollapsed(true)}
+          favorites={favoriteResources}
+        />
+        <div className="odh-learning-paths__view-panel">
+          <LearningCenterToolbar
+            count={filteredDocApps.length}
+            totalCount={docApps.length}
+            viewType={viewType || CARD_VIEW}
+            updateViewType={setViewType}
+            filtersCollapsible={filtersCollapsible}
+            onToggleFiltersCollapsed={() => setFiltersCollapsed(!filtersCollapsed)}
+          />
+          <LearningCenterDataView
+            filteredDocApps={filteredDocApps}
+            favorites={favoriteResources}
+            updateFavorite={updateFavorite}
+            viewType={viewType || CARD_VIEW}
+          />
+        </div>
+      </div>
+    </ApplicationsPage>
   );
 };
 

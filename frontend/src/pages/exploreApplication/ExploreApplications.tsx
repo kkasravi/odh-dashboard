@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useHistory } from 'react-router';
+import classNames from 'classnames';
 import * as _ from 'lodash';
 import {
   Drawer,
@@ -8,17 +10,18 @@ import {
   PageSection,
 } from '@patternfly/react-core';
 import { useWatchComponents } from '../../utilities/useWatchComponents';
+import { useWatchDashboardConfig } from '../../utilities/useWatchDashboardConfig';
 import OdhExploreCard from '../../components/OdhExploreCard';
 import ApplicationsPage from '../ApplicationsPage';
 import { OdhApplication } from '../../types';
 import GetStartedPanel from './GetStartedPanel';
 import { useQueryParams } from '../../utilities/useQueryParams';
 import { removeQueryArgument, setQueryArgument } from '../../utilities/router';
-import { useHistory } from 'react-router';
 
 import './ExploreApplications.scss';
 
 const description = `Add optional applications to your Open Data Hub instance.`;
+const disabledDescription = `View optional applications for your Open Data Hub instance. Contact an administrator to install these applications.`;
 
 type ExploreApplicationsInnerProps = {
   loaded: boolean;
@@ -31,42 +34,54 @@ type ExploreApplicationsInnerProps = {
 
 const ExploreApplicationsInner: React.FC<ExploreApplicationsInnerProps> = React.memo(
   ({ loaded, isEmpty, loadError, exploreComponents, selectedComponent, updateSelection }) => {
+    const { dashboardConfig } = useWatchDashboardConfig();
+    const bodyClasses = classNames('odh-explore-apps__body', {
+      'm-side-panel-open': !!selectedComponent,
+    });
+    const [enableApp, setEnableApp] = React.useState<OdhApplication>();
+
     return (
-      <ApplicationsPage
-        title="Explore"
-        description={description}
-        loaded={loaded}
-        empty={isEmpty}
-        loadError={loadError}
-      >
-        {!isEmpty ? (
-          <Drawer isExpanded={!!selectedComponent} isInline>
-            <DrawerContent
-              panelContent={
-                <GetStartedPanel
-                  onClose={() => updateSelection()}
-                  selectedApp={selectedComponent}
-                />
-              }
+      <Drawer isExpanded={!dashboardConfig.disableInfo && !!selectedComponent} isInline>
+        <DrawerContent
+          panelContent={
+            <GetStartedPanel
+              onClose={() => updateSelection()}
+              selectedApp={selectedComponent}
+              onEnable={() => setEnableApp(selectedComponent)}
+            />
+          }
+        >
+          <DrawerContentBody className={bodyClasses}>
+            <ApplicationsPage
+              title="Explore"
+              description={dashboardConfig.disableInfo ? disabledDescription : description}
+              loaded={loaded}
+              empty={isEmpty}
+              loadError={loadError}
             >
-              <DrawerContentBody className="odh-explore-apps__body">
-                <PageSection>
-                  <Gallery className="odh-explore-apps__gallery" hasGutter>
-                    {exploreComponents.map((c) => (
-                      <OdhExploreCard
-                        key={c.metadata.name}
-                        odhApp={c}
-                        isSelected={selectedComponent === c}
-                        onSelect={() => updateSelection(c.metadata.name)}
-                      />
-                    ))}
-                  </Gallery>
-                </PageSection>
-              </DrawerContentBody>
-            </DrawerContent>
-          </Drawer>
-        ) : null}
-      </ApplicationsPage>
+              {!isEmpty ? (
+                <div className="odh-dashboard__page-content">
+                  <PageSection>
+                    <Gallery className="odh-explore-apps__gallery" hasGutter>
+                      {exploreComponents.map((c) => (
+                        <OdhExploreCard
+                          key={c.metadata.name}
+                          odhApp={c}
+                          isSelected={selectedComponent?.metadata.name === c.metadata.name}
+                          onSelect={() => updateSelection(c.metadata.name)}
+                          disableInfo={dashboardConfig.disableInfo}
+                          enableOpen={c.metadata.name === enableApp?.metadata.name}
+                          onEnableClose={() => setEnableApp(undefined)}
+                        />
+                      ))}
+                    </Gallery>
+                  </PageSection>
+                </div>
+              ) : null}
+            </ApplicationsPage>
+          </DrawerContentBody>
+        </DrawerContent>
+      </Drawer>
     );
   },
 );

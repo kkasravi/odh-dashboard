@@ -1,23 +1,22 @@
 import React from 'react';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 import {
   Card,
-  CardHeader,
   CardBody,
   CardFooter,
+  CardHeader,
   Dropdown,
   DropdownItem,
   KebabToggle,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon } from '@patternfly/react-icons';
-import { QuickStartContext, QuickStartContextValues } from '@cloudmosaic/quickstarts';
 import { OdhApplication } from '../types';
-import { getQuickStartLabel, launchQuickStart } from '../utilities/quickStartUtils';
+import { getLaunchStatus, launchQuickStart, LaunchStatusEnum } from '../utilities/quickStartUtils';
 import BrandImage from './BrandImage';
 import SupportedAppTitle from './SupportedAppTitle';
+import { useQuickStartCardSelected } from './useQuickStartCardSelected';
 
 import './OdhCard.scss';
-import { makeCardVisible } from '../utilities/utils';
 
 type OdhAppCardProps = {
   odhApp: OdhApplication;
@@ -25,17 +24,10 @@ type OdhAppCardProps = {
 
 const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
   const [isOpen, setIsOpen] = React.useState(false);
-  const qsContext = React.useContext<QuickStartContextValues>(QuickStartContext);
-
-  const selected = React.useMemo(() => {
-    return qsContext.activeQuickStartID === odhApp.spec.quickStart;
-  }, [odhApp.spec.quickStart, qsContext.activeQuickStartID]);
-
-  React.useEffect(() => {
-    if (selected) {
-      makeCardVisible(odhApp.metadata.name);
-    }
-  }, [odhApp.metadata.name, selected]);
+  const [qsContext, selected] = useQuickStartCardSelected(
+    odhApp.spec.quickStart,
+    odhApp.metadata.name,
+  );
 
   const onToggle = (value) => {
     setIsOpen(value);
@@ -48,7 +40,6 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
   const onQuickStart = (e) => {
     e.preventDefault();
     launchQuickStart(odhApp.spec.quickStart, qsContext);
-    makeCardVisible(odhApp.metadata.name);
   };
 
   const dropdownItems = [
@@ -84,6 +75,8 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
   });
   const quickStartClasses = classNames('odh-card__footer__link', {
     'm-hidden': !odhApp.spec.quickStart,
+    'm-disabled':
+      getLaunchStatus(odhApp.spec.quickStart || '', qsContext) === LaunchStatusEnum.Close,
   });
 
   const cardFooter = (
@@ -98,7 +91,7 @@ const OdhAppCard: React.FC<OdhAppCardProps> = ({ odhApp }) => {
         <ExternalLinkAltIcon />
       </a>
       <a className={quickStartClasses} href="#" onClick={onQuickStart}>
-        {getQuickStartLabel(odhApp.spec.quickStart, qsContext)}
+        Quick start
       </a>
     </CardFooter>
   );

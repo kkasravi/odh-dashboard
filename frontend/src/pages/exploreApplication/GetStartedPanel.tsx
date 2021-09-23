@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  Alert,
   Button,
   ButtonVariant,
   DrawerPanelBody,
@@ -13,43 +14,31 @@ import {
   EmptyStateBody,
   Spinner,
   Title,
+  Tooltip,
 } from '@patternfly/react-core';
 import { ExternalLinkAltIcon, WarningTriangleIcon } from '@patternfly/react-icons';
-import { OdhApplication, OdhGettingStarted } from '../../types';
+import { OdhApplication } from '../../types';
+import { useWatchDashboardConfig } from '../../utilities/useWatchDashboardConfig';
+import { useGettingStarted } from '../../utilities/useGettingStarted';
 import MarkdownView from '../../components/MarkdownView';
-import { fetchGettingStartedDoc } from '../../services/gettingStartedService';
-import EnableModal from './EnableModal';
 
 import './GetStartedPanel.scss';
+
+const DEFAULT_BETA_TEXT =
+  'Beta means the service is available for early access prior to official' +
+  " release and will not appear in the 'Enabled' view. You can still access the service by" +
+  ' following the instructions';
 
 type GetStartedPanelProps = {
   selectedApp?: OdhApplication;
   onClose: () => void;
+  onEnable: () => void;
 };
 
-const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose }) => {
-  const [loaded, setLoaded] = React.useState<boolean>(false);
-  const [loadError, setLoadError] = React.useState<Error>();
-  const [odhGettingStarted, setOdhGettingStarted] = React.useState<OdhGettingStarted>();
-  const [enableOpen, setEnableOpen] = React.useState<boolean>(false);
+const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose, onEnable }) => {
   const appName = selectedApp?.metadata.name;
-
-  React.useEffect(() => {
-    if (appName) {
-      setLoaded(false);
-      setOdhGettingStarted(undefined);
-      fetchGettingStartedDoc(appName)
-        .then((gs: OdhGettingStarted) => {
-          setLoaded(true);
-          setLoadError(undefined);
-          setOdhGettingStarted(gs);
-        })
-        .catch((e) => {
-          setLoadError(e);
-        });
-    }
-  }, [appName]);
-
+  const { odhGettingStarted, loaded, loadError } = useGettingStarted(appName);
+  const { dashboardConfig } = useWatchDashboardConfig();
   if (!selectedApp) {
     return null;
   }
@@ -85,15 +74,27 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose 
     return <MarkdownView markdown={odhGettingStarted?.markdown} />;
   };
 
-  const onEnableClose = (success?: boolean) => {
-    if (success) {
-      selectedApp.spec.isEnabled = true;
+  const renderEnableButton = () => {
+    if (!selectedApp.spec.enable || selectedApp.spec.isEnabled) {
+      return null;
     }
-    setEnableOpen(false);
-  };
-
-  const onEnable = () => {
-    setEnableOpen(true);
+    const button = (
+      <Button
+        variant={ButtonVariant.secondary}
+        onClick={onEnable}
+        isDisabled={!dashboardConfig.enablement}
+      >
+        Enable
+      </Button>
+    );
+    if (dashboardConfig.enablement) {
+      return button;
+    }
+    return (
+      <Tooltip content="This feature has been disabled by an administrator.">
+        <span>{button}</span>
+      </Tooltip>
+    );
   };
 
   return (
@@ -127,18 +128,27 @@ const GetStartedPanel: React.FC<GetStartedPanelProps> = ({ selectedApp, onClose 
               <span className="odh-get-started__get-started-text">Get started</span>
               <ExternalLinkAltIcon />
             </a>
-            {selectedApp.spec.enable && !selectedApp.spec.isEnabled ? (
-              <Button variant={ButtonVariant.secondary} onClick={onEnable}>
-                Enable
-              </Button>
-            ) : null}
+            {renderEnableButton()}
           </DrawerPanelBody>
         ) : null}
         <DrawerPanelBody className="odh-get-started__body">
+          {selectedApp.spec.beta ? (
+            <Alert
+              variantLabel="error"
+              variant="info"
+              title={
+                selectedApp.spec.betaTitle ||
+                `${selectedApp.spec.displayName} is currently in beta.`
+              }
+              aria-live="polite"
+              isInline
+            >
+              {selectedApp.spec.betaText || DEFAULT_BETA_TEXT}
+            </Alert>
+          ) : null}
           {renderMarkdownContents()}
         </DrawerPanelBody>
       </DrawerPanelContent>
-      {enableOpen ? <EnableModal onClose={onEnableClose} selectedApp={selectedApp} /> : null}
     </>
   );
 };

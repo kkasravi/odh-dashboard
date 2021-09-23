@@ -1,10 +1,11 @@
 import React from 'react';
-import * as classNames from 'classnames';
+import classNames from 'classnames';
 import { Card, CardHeader, CardBody } from '@patternfly/react-core';
 import { OdhApplication } from '../types';
+import { makeCardVisible } from '../utilities/utils';
+import EnableModal from '../pages/exploreApplication/EnableModal';
 import BrandImage from './BrandImage';
 import SupportedAppTitle from './SupportedAppTitle';
-import { makeCardVisible } from '../utilities/utils';
 
 import './OdhCard.scss';
 
@@ -12,10 +13,21 @@ type OdhExploreCardProps = {
   odhApp: OdhApplication;
   isSelected: boolean;
   onSelect: () => void;
+  disableInfo?: boolean;
+  enableOpen: boolean;
+  onEnableClose: () => void;
 };
 
-const OdhExploreCard: React.FC<OdhExploreCardProps> = ({ odhApp, isSelected, onSelect }) => {
-  const cardClasses = classNames('odh-card', { 'm-disabled': odhApp.spec.comingSoon });
+const OdhExploreCard: React.FC<OdhExploreCardProps> = ({
+  odhApp,
+  isSelected,
+  onSelect,
+  disableInfo = false,
+  enableOpen,
+  onEnableClose,
+}) => {
+  const disabled = odhApp.spec.comingSoon || disableInfo;
+  const cardClasses = classNames('odh-card', { 'm-disabled': disabled });
 
   React.useEffect(() => {
     if (isSelected) {
@@ -26,11 +38,11 @@ const OdhExploreCard: React.FC<OdhExploreCardProps> = ({ odhApp, isSelected, onS
   return (
     <Card
       id={odhApp.metadata.name}
-      isHoverable={!odhApp.spec.comingSoon}
-      isSelectable={!odhApp.spec.comingSoon}
+      isHoverable={!disabled}
+      isSelectable={!disabled}
       isSelected={isSelected}
       className={cardClasses}
-      onClick={() => !odhApp.spec.comingSoon && onSelect()}
+      onClick={() => !disabled && onSelect()}
     >
       <CardHeader>
         <BrandImage
@@ -38,10 +50,18 @@ const OdhExploreCard: React.FC<OdhExploreCardProps> = ({ odhApp, isSelected, onS
           src={odhApp.spec.img}
           alt={odhApp.spec.displayName}
         />
-        {odhApp.spec.comingSoon ? <span className="odh-card__coming-soon">Coming soon</span> : null}
+        <div className="odh-card__explore-badges">
+          {odhApp.spec.comingSoon ? (
+            <span className="odh-card__coming-soon">Coming soon</span>
+          ) : null}
+          {odhApp.spec.beta ? (
+            <span className="odh-card__partner-badge odh-m-beta">Beta</span>
+          ) : null}
+        </div>
       </CardHeader>
       <SupportedAppTitle odhApp={odhApp} showProvider />
       <CardBody>{odhApp.spec.description}</CardBody>
+      <EnableModal shown={enableOpen} onClose={onEnableClose} selectedApp={odhApp} />
     </Card>
   );
 };

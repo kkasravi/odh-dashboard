@@ -18,11 +18,7 @@ type EnabledApplicationsInnerProps = {
   loadError?: Error;
   components: OdhApplication[];
 };
-
-// use to record the current enabled components
-let enabledComponents: ODHApp[] = [];
-
-const EnabledApplicationsInner: React.FC<EnabledApplicationsInnerProps> = React.memo(
+export const EnabledApplicationsInner: React.FC<EnabledApplicationsInnerProps> = React.memo(
   ({ loaded, loadError, components }) => {
     const isEmpty = !components || components.length === 0;
 
@@ -35,13 +31,15 @@ const EnabledApplicationsInner: React.FC<EnabledApplicationsInnerProps> = React.
         loadError={loadError}
       >
         {!isEmpty ? (
-          <PageSection>
-            <Gallery className="odh-installed-apps__gallery" hasGutter>
-              {components.map((c) => (
-                <OdhAppCard key={c.metadata.name} odhApp={c} />
-              ))}
-            </Gallery>
-          </PageSection>
+          <div className="odh-dashboard__page-content">
+            <PageSection>
+              <Gallery className="odh-installed-apps__gallery" hasGutter>
+                {components.map((c) => (
+                  <OdhAppCard key={c.metadata.name} odhApp={c} />
+                ))}
+              </Gallery>
+            </PageSection>
+          </div>
         ) : null}
       </ApplicationsPage>
     );

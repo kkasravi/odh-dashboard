@@ -9,7 +9,9 @@ export const getUserPending = (): GetUserAction => ({
   payload: {},
 });
 
-export const getUserFulfilled = (response: { kube: { currentUser: string } }): GetUserAction => ({
+export const getUserFulfilled = (response: {
+  kube: { userName: string; clusterID: string };
+}): GetUserAction => ({
   type: Actions.GET_USER_FULFILLED,
   payload: {
     user: response.kube.userName,
@@ -71,5 +73,13 @@ export const removeNotification = (
 ): ThunkAction<void, AppState, unknown, Action<string>> => {
   return (dispatch) => {
     dispatch({ type: Actions.REMOVE_NOTIFICATION, payload: { notification } });
+  };
+};
+
+export const forceComponentsUpdate = (): ThunkAction<void, AppState, unknown, Action<string>> => {
+  return (dispatch) => {
+    dispatch({
+      type: Actions.FORCE_COMPONENTS_UPDATE,
+    });
   };
 };

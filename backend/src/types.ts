@@ -2,12 +2,19 @@ import k8s from '@kubernetes/client-node';
 import { User } from '@kubernetes/client-node/dist/config_types';
 import { FastifyInstance } from 'fastify';
 
+export type DashboardConfig = {
+  enablement: boolean;
+  disableInfo: boolean;
+  disableSupport: boolean;
+};
+
 // Add a minimal QuickStart type here as there is no way to get types without pulling in frontend (React) modules
 export declare type QuickStart = {
   apiVersion?: string;
   kind?: string;
   metadata: {
     name: string;
+    annotations?: { [key: string]: string };
   };
   spec: {
     version?: number;
@@ -27,8 +34,28 @@ export type K8sResourceCommon = {
     name?: string;
     namespace?: string;
     uid?: string;
+    labels?: { [key: string]: string };
+    annotations?: { [key: string]: string };
   };
 };
+
+export enum BUILD_PHASE {
+  none = 'Not started',
+  new = 'New',
+  running = 'Running',
+  pending = 'Pending',
+  complete = 'Complete',
+  failed = 'Failed',
+  cancelled = 'Cancelled',
+}
+
+export type BuildKind = {
+  status: {
+    phase: BUILD_PHASE;
+    completionTimestamp: string;
+    startTimestamp: string;
+  };
+} & K8sResourceCommon;
 
 // Minimal type for routes
 export type RouteKind = {
@@ -45,6 +72,13 @@ export type CSVKind = {
   status: {
     phase?: string;
     reason?: string;
+  };
+} & K8sResourceCommon;
+
+// Minimal type for ConsoleLinks
+export type ConsoleLinkKind = {
+  spec: {
+    href?: string;
   };
 } & K8sResourceCommon;
 
@@ -91,6 +125,7 @@ export type KubeFastifyInstance = FastifyInstance & {
 export type OdhApplication = {
   metadata: {
     name: string;
+    annotations?: { [key: string]: string };
   };
   spec: {
     displayName: string;
@@ -100,6 +135,7 @@ export type OdhApplication = {
     routeNamespace: string | null;
     routeSuffix: string | null;
     serviceName: string | null;
+    consoleLink: string | null;
     endpoint: string | null;
     link: string | null;
     img: string;
@@ -109,12 +145,17 @@ export type OdhApplication = {
     support: string;
     quickStart: string | null;
     comingSoon: boolean | null;
+    beta?: boolean | null;
+    betaTitle?: string | null;
+    betaText?: string | null;
     isEnabled: boolean | null;
     kfdefApplications: string[];
     csvName: string;
     enable?: {
       title: string;
       actionLabel: string;
+      linkPreface?: string;
+      link?: string;
       description?: string;
       variables?: { [key: string]: string };
       variableDisplayText?: { [key: string]: string };
@@ -122,6 +163,15 @@ export type OdhApplication = {
       validationSecret: string;
       validationJob: string;
       validationConfigMap?: string;
+    };
+    enableCR: {
+      group: string;
+      version: string;
+      plural: string;
+      name: string;
+      namespace?: string;
+      field?: string;
+      value?: string;
     };
     featureFlag?: string;
   };
@@ -138,6 +188,7 @@ export type OdhDocument = {
   metadata: {
     name: string;
     type: string;
+    annotations?: { [key: string]: string };
   };
   spec: {
     displayName: string;
@@ -148,7 +199,6 @@ export type OdhDocument = {
     img?: string;
     icon?: string;
     durationMinutes?: number;
-    markdown?: string;
     featureFlag?: string;
   };
 };
@@ -160,6 +210,6 @@ export type OdhGettingStarted = {
 
 export type BuildStatus = {
   name: string;
-  status: string;
+  status: BUILD_PHASE;
   timestamp?: string;
 };

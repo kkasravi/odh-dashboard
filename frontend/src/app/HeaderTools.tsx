@@ -1,24 +1,36 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import {
   Dropdown,
   DropdownPosition,
   DropdownToggle,
+  NotificationBadge,
   PageHeaderTools,
   PageHeaderToolsGroup,
   PageHeaderToolsItem,
   DropdownItem,
 } from '@patternfly/react-core';
-import {
-  CaretDownIcon,
-  ExternalLinkAltIcon,
-  QuestionCircleIcon,
-  UserIcon,
-} from '@patternfly/react-icons';
+import { CaretDownIcon, ExternalLinkAltIcon, QuestionCircleIcon } from '@patternfly/react-icons';
 import { COMMUNITY_LINK, DOC_LINK, SUPPORT_LINK } from '../utilities/const';
+import { AppNotification, State } from '../redux/types';
+import { useWatchDashboardConfig } from '../utilities/useWatchDashboardConfig';
 
-const HeaderTools: React.FC = () => {
+interface HeaderToolsProps {
+  onNotificationsClick: () => void;
+}
+
+const HeaderTools: React.FC<HeaderToolsProps> = ({ onNotificationsClick }) => {
   const [userMenuOpen, setUserMenuOpen] = React.useState<boolean>(false);
   const [helpMenuOpen, setHelpMenuOpen] = React.useState<boolean>(false);
+  const notifications: AppNotification[] = useSelector<State, AppNotification[]>(
+    (state) => state.appState.notifications,
+  );
+  const userName: string = useSelector<State, string>((state) => state.appState.user || '');
+  const { dashboardConfig } = useWatchDashboardConfig();
+
+  const newNotifications = React.useMemo(() => {
+    return notifications.filter((notification) => !notification.read).length;
+  }, [notifications]);
 
   const handleLogout = () => {
     setUserMenuOpen(false);
@@ -54,7 +66,7 @@ const HeaderTools: React.FC = () => {
       </DropdownItem>,
     );
   }
-  if (SUPPORT_LINK) {
+  if (SUPPORT_LINK && !dashboardConfig.disableSupport) {
     helpMenuItems.push(
       <DropdownItem
         key="support"
@@ -88,6 +100,9 @@ const HeaderTools: React.FC = () => {
   return (
     <PageHeaderTools>
       <PageHeaderToolsGroup className="hidden-xs">
+        <PageHeaderToolsItem>
+          <NotificationBadge isRead count={newNotifications} onClick={onNotificationsClick} />
+        </PageHeaderToolsItem>
         {helpMenuItems.length > 0 ? (
           <PageHeaderToolsItem>
             <Dropdown
@@ -115,7 +130,7 @@ const HeaderTools: React.FC = () => {
                 onToggle={() => setUserMenuOpen(!userMenuOpen)}
                 toggleIndicator={CaretDownIcon}
               >
-                <UserIcon className="odh-dashboard__user-icon" />
+                {userName}
               </DropdownToggle>
             }
             isOpen={userMenuOpen}
